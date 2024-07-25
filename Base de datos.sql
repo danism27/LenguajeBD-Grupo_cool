@@ -155,7 +155,7 @@ VALUES (305, 'Pastillas de freno', TO_DATE('2023-05-01', 'YYYY-MM-DD'), 'admin')
 ALTER TABLE REPUESTOS ADD (PRECIO_REPUESTO NUMBER(10, 2));
 
 UPDATE REPUESTOS SET PRECIO_REPUESTO = 2500 WHERE COD_REPUESTO = 301; -- Filtro de aire
-UPDATE REPUESTOS SET PRECIO_REPUESTO = 7000 WHERE COD_REPUESTO = 302; -- Batería
+UPDATE REPUESTOS SET PRECIO_REPUESTO = 7000 WHERE COD_REPUESTO = 302; -- Baterï¿½a
 UPDATE REPUESTOS SET PRECIO_REPUESTO = 5000 WHERE COD_REPUESTO = 303; -- Aceite de motor
 UPDATE REPUESTOS SET PRECIO_REPUESTO = 3500 WHERE COD_REPUESTO = 304; -- Filtro de combustible
 UPDATE REPUESTOS SET PRECIO_REPUESTO = 4500 WHERE COD_REPUESTO = 305; -- Pastillas de freno
@@ -1669,3 +1669,264 @@ JOIN FACTURAS F ON DF.COD_FACTURA = F.ID_FACTURA;
 CREATE OR REPLACE VIEW V_VEHICULOS_ESTADO_REGISTRO AS
 SELECT NUM_PLACA, TIPO_VEHICULO, ESTADO_VEHICULO, FECHA_REGISTRO
 FROM VEHICULOS;
+
+/*
+********
+*                                                                    *
+*                             Triggers                                 *
+*                                                                    *
+********
+*/
+
+CREATE OR REPLACE TRIGGER actualizar_total_factura
+AFTER INSERT OR UPDATE OR DELETE ON DETALLE_FACTURA
+FOR EACH ROW
+BEGIN
+    DECLARE
+        v_total NUMBER(10, 2);
+    BEGIN
+        SELECT SUM(rp.PRECIO_REPUESTO * df.CANTIDAD)
+        INTO v_total
+        FROM DETALLE_FACTURA df
+        JOIN REPUESTOS rp ON df.COD_REPUESTO = rp.ID_REPUESTO
+        WHERE df.COD_FACTURA = :NEW.COD_FACTURA;
+
+        UPDATE FACTURAS
+        SET TOTAL_FACTURA = NVL(v_total, 0)
+        WHERE ID_FACTURA = :NEW.COD_FACTURA;
+    END;
+END;
+/
+
+CREATE OR REPLACE TRIGGER actualizar_estado_vehiculo
+BEFORE UPDATE ON VEHICULOS
+FOR EACH ROW
+BEGIN
+    IF :NEW.ESTADO_VEHICULO != :OLD.ESTADO_VEHICULO THEN
+        :NEW.FECHA_ESTADO := SYSDATE;
+    END IF;
+END;
+/
+
+CREATE OR REPLACE TRIGGER evitar_duplicados_contacto
+BEFORE INSERT OR UPDATE ON CONTACTOS
+FOR EACH ROW
+BEGIN
+    DECLARE
+        v_count INTEGER;
+    BEGIN
+        SELECT COUNT(*)
+        INTO v_count
+        FROM CONTACTOS
+        WHERE EMAIL_CONTACTO = :NEW.EMAIL_CONTACTO
+        AND ID_CONTACTO != :NEW.ID_CONTACTO;
+
+        IF v_count > 0 THEN
+            RAISE_APPLICATION_ERROR(-20001, 'El contacto con este email ya existe.');
+        END IF;
+    END;
+END;
+/
+
+CREATE OR REPLACE TRIGGER actualizar_total_ventas_repuesto
+AFTER INSERT OR UPDATE OR DELETE ON DETALLE_FACTURA
+FOR EACH ROW
+BEGIN
+    DECLARE
+        v_total NUMBER(10, 2);
+    BEGIN
+        SELECT SUM(df.CANTIDAD * r.PRECIO_REPUESTO)
+        INTO v_total
+        FROM DETALLE_FACTURA df
+        JOIN REPUESTOS r ON df.COD_REPUESTO = r.ID_REPUESTO
+        WHERE df.COD_REPUESTO = :NEW.COD_REPUESTO;
+
+        UPDATE REPUESTOS
+        SET TOTAL_VENTAS = NVL(v_total, 0)
+        WHERE ID_REPUESTO = :NEW.COD_REPUESTO;
+    END;
+END;
+/
+
+CREATE OR REPLACE TRIGGER registrar_fechas_factura
+BEFORE INSERT OR UPDATE ON FACTURAS
+FOR EACH ROW
+BEGIN
+    IF INSERTING THEN
+        :NEW.FECHA_CREACION := SYSDATE;
+    END IF;
+
+    IF UPDATING THEN
+        :NEW.FECHA_ACTUALIZACION := SYSDATE;
+    END IF;
+END;
+/
+
+
+/*
+********
+*                                                                    *
+*                             Cursores                                *
+*                                                                    *
+********
+*/
+
+
+CREATE OR REPLACE FUNCTION obtener_facturas
+RETURN SYS_REFCURSOR IS
+    v_cursor SYS_REFCURSOR;
+BEGIN
+    OPEN v_cursor FOR SELECT * FROM FACTURAS;
+    RETURN v_cursor;
+END;
+/
+
+CREATE OR REPLACE FUNCTION obtener_repuestos
+RETURN SYS_REFCURSOR IS
+    v_cursor SYS_REFCURSOR;
+BEGIN
+    OPEN v_cursor FOR SELECT * FROM REPUESTOS;
+    RETURN v_cursor;
+END;
+/
+
+CREATE OR REPLACE FUNCTION obtener_servicios
+RETURN SYS_REFCURSOR IS
+    v_cursor SYS_REFCURSOR;
+BEGIN
+    OPEN v_cursor FOR SELECT * FROM SERVICIOS;
+    RETURN v_cursor;
+END;
+/
+
+CREATE OR REPLACE FUNCTION obtener_vehiculos_activos
+RETURN SYS_REFCURSOR IS
+    v_cursor SYS_REFCURSOR;
+BEGIN
+    OPEN v_cursor FOR SELECT * FROM VEHICULOS WHERE ESTADO_VEHICULO = 'Activo';
+    RETURN v_cursor;
+END;
+/
+
+CREATE OR REPLACE FUNCTION obtener_empleados
+RETURN SYS_REFCURSOR IS
+    v_cursor SYS_REFCURSOR;
+BEGIN
+    OPEN v_cursor FOR SELECT * FROM EMPLEADOS;
+    RETURN v_cursor;
+END;
+/
+
+CREATE OR REPLACE FUNCTION obtener_clientes
+RETURN SYS_REFCURSOR IS
+    v_cursor SYS_REFCURSOR;
+BEGIN
+    OPEN v_cursor FOR SELECT * FROM CONTACTOS WHERE TIPO_CONTACTO = 'Cliente';
+    RETURN v_cursor;
+END;
+/
+
+ CREATE OR REPLACE FUNCTION obtener_proveedores
+RETURN SYS_REFCURSOR IS
+    v_cursor SYS_REFCURSOR;
+BEGIN
+    OPEN v_cursor FOR SELECT * FROM CONTACTOS WHERE TIPO_CONTACTO = 'Proveedor';
+    RETURN v_cursor;
+END;
+/
+
+ CREATE OR REPLACE FUNCTION obtener_detalle_factura(p_id_factura IN INTEGER)
+RETURN SYS_REFCURSOR IS
+    v_cursor SYS_REFCURSOR;
+BEGIN
+    OPEN v_cursor FOR
+        SELECT df.COD_REPUESTO, r.NOMBRE_REPUESTO, df.CANTIDAD, r.PRECIO_REPUESTO
+        FROM DETALLE_FACTURA df
+        JOIN REPUESTOS r ON df.COD_REPUESTO = r.ID_REPUESTO
+        WHERE df.COD_FACTURA = p_id_factura;
+    RETURN v_cursor;
+END;
+/
+
+ CREATE OR REPLACE FUNCTION obtener_facturas_cliente(p_id_cliente IN INTEGER)
+RETURN SYS_REFCURSOR IS
+    v_cursor SYS_REFCURSOR;
+BEGIN
+    OPEN v_cursor FOR
+        SELECT * 
+        FROM FACTURAS 
+        WHERE COD_CLIENTE = p_id_cliente;
+    RETURN v_cursor;
+END;
+/
+
+CREATE OR REPLACE FUNCTION obtener_servicios_precios
+RETURN SYS_REFCURSOR IS
+    v_cursor SYS_REFCURSOR;
+BEGIN
+    OPEN v_cursor FOR
+        SELECT COD_SERVICIO, NOMBRE_SERVICIO, DESCRIPCION_SERVICIO, PRECIO_SERVICIO
+        FROM SERVICIOS;
+    RETURN v_cursor;
+END;
+/
+
+CREATE OR REPLACE FUNCTION obtener_vehiculos_por_tipo(p_tipo_vehiculo IN VARCHAR2)
+RETURN SYS_REFCURSOR IS
+    v_cursor SYS_REFCURSOR;
+BEGIN
+    OPEN v_cursor FOR
+        SELECT * 
+        FROM VEHICULOS 
+        WHERE TIPO_VEHICULO = p_tipo_vehiculo;
+    RETURN v_cursor;
+END;
+/
+
+CREATE OR REPLACE FUNCTION obtener_empleados_por_cargo(p_cargo_empleado IN VARCHAR2)
+RETURN SYS_REFCURSOR IS
+    v_cursor SYS_REFCURSOR;
+BEGIN
+    OPEN v_cursor FOR
+        SELECT * 
+        FROM EMPLEADOS 
+        WHERE CARGO_EMPLEADO = p_cargo_empleado;
+    RETURN v_cursor;
+END;
+/
+
+CREATE OR REPLACE FUNCTION obtener_repuestos_precios
+RETURN SYS_REFCURSOR IS
+    v_cursor SYS_REFCURSOR;
+BEGIN
+    OPEN v_cursor FOR
+        SELECT ID_REPUESTO, NOMBRE_REPUESTO, PRECIO_REPUESTO 
+        FROM REPUESTOS;
+    RETURN v_cursor;
+END;
+/
+
+CREATE OR REPLACE FUNCTION obtener_servicios_oficina(p_id_oficina IN INTEGER)
+RETURN SYS_REFCURSOR IS
+    v_cursor SYS_REFCURSOR;
+BEGIN
+    OPEN v_cursor FOR
+        SELECT s.COD_SERVICIO, s.NOMBRE_SERVICIO, s.PRECIO_SERVICIO
+        FROM SERVICIOS s
+        JOIN EMPLEADOS e ON s.COD_SERVICIO = e.ID_EMPLEADO
+        WHERE e.ID_OFICINA = p_id_oficina;
+    RETURN v_cursor;
+END;
+/
+
+CREATE OR REPLACE FUNCTION obtener_facturas_por_cliente(p_id_cliente IN INTEGER)
+RETURN SYS_REFCURSOR IS
+    v_cursor SYS_REFCURSOR;
+BEGIN
+    OPEN v_cursor FOR
+        SELECT f.ID_FACTURA, f.FECHA_FACTURA, f.TOTAL_FACTURA
+        FROM FACTURAS f
+        WHERE f.COD_CLIENTE = p_id_cliente;
+    RETURN v_cursor;
+END;
+/
