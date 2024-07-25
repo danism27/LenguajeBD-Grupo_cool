@@ -40,6 +40,35 @@ BEGIN
 END;
 /
 --------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+-- ID_OFICINA: Columna de tipo INTEGER, equivalente a NUMBER(38) en Oracle.
+-- GENERADO AUTOMï¿½TICAMENTE CON AS IDENTITY: La columna usa una secuencia implï¿½cita para generar valores ï¿½nicos automï¿½ticamente.
+-- START WITH 1: El valor inicial de la secuencia es 1.
+-- INCREMENT BY 1: Cada nuevo valor generado aumenta en 1 respecto al anterior.
+--------------------------------------------------------------------------------
+
+-- CONSTRAINT PK_OFICINAS PRIMARY KEY (ID_OFICINA):
+-- Define la restricciï¿½n de clave primaria llamada PK_OFICINAS en la columna ID_OFICINA.
+-- Garantiza que los valores en ID_OFICINA sean ï¿½nicos y no nulos.
+-- Crea automï¿½ticamente un ï¿½ndice para mejorar el rendimiento en bï¿½squedas y consultas.
+--------------------------------------------------------------------------------
+
+
+
+
+/*
+**********************************************************************
+*                                                                    *
+*                            TABLAS                                  *
+*                                                                    *
+**********************************************************************
+*/
+
+
+
+
+
 -- Crear tabla de contactos
 CREATE TABLE CONTACTOS(
     ID_CONTACTO INTEGER GENERATED ALWAYS AS IDENTITY(START WITH 1 INCREMENT BY 1),
@@ -260,20 +289,14 @@ VALUES ('Ana', 'Martinez', 'Secretaria', TO_DATE('2023-04-25', 'YYYY-MM-DD'), 25
 INSERT INTO EMPLEADOS (NOMBRE_EMPLEADO, APELLIDO_EMPLEADO, CARGO_EMPLEADO, FECHA_CONTRATACION, SALARIO)
 VALUES ('Luis', 'Rodriguez', 'Supervisor', TO_DATE('2023-05-30', 'YYYY-MM-DD'), 4500.00);
 
---------------------------------------------------------------------------------
--- ID_OFICINA: Columna de tipo INTEGER, equivalente a NUMBER(38) en Oracle.
--- GENERADO AUTOMï¿½TICAMENTE CON AS IDENTITY: La columna usa una secuencia implï¿½cita para generar valores ï¿½nicos automï¿½ticamente.
--- START WITH 1: El valor inicial de la secuencia es 1.
--- INCREMENT BY 1: Cada nuevo valor generado aumenta en 1 respecto al anterior.
---------------------------------------------------------------------------------
 
--- CONSTRAINT PK_OFICINAS PRIMARY KEY (ID_OFICINA):
--- Define la restricciï¿½n de clave primaria llamada PK_OFICINAS en la columna ID_OFICINA.
--- Garantiza que los valores en ID_OFICINA sean ï¿½nicos y no nulos.
--- Crea automï¿½ticamente un ï¿½ndice para mejorar el rendimiento en bï¿½squedas y consultas.
---------------------------------------------------------------------------------
-
-------------------------    CRUD    --------------------------------------------
+/*
+**********************************************************************
+*                                                                    *
+*                              CRUD                                  *
+*                                                                    *
+**********************************************************************
+*/
 set SERVEROUTPUT on;
 -----------------------    CONTACTOS   -----------------------------------------
 ------------------------    CREAR   --------------------------------------------
@@ -634,13 +657,645 @@ END;
 -----------------------    DETALLE_FACTURA   -----------------------------------
 SELECT * FROM DETALLE_FACTURA;
 ------------------------    CREAR   --------------------------------------------
+CREATE OR REPLACE PROCEDURE insert_detalle_factura(
+    p_cod_factura IN DETALLE_FACTURA.COD_FACTURA%TYPE,
+    p_cod_repuesto IN DETALLE_FACTURA.COD_REPUESTO%TYPE,
+    p_cantidad IN DETALLE_FACTURA.CANTIDAD%TYPE
+) AS
+BEGIN
+    INSERT INTO DETALLE_FACTURA (COD_FACTURA, COD_REPUESTO, CANTIDAD)
+    VALUES (p_cod_factura, p_cod_repuesto, p_cantidad);
+    
+    DBMS_OUTPUT.PUT_LINE('Detalle de factura insertado correctamente');
+END;
 
---------------------------Funciones (Dani)------------------------------------------------------
+-- Usar procedure
 
--- Habilitar la salida de DBMS_OUTPUT para la primera función
+BEGIN
+    insert_detalle_factura(
+        p_cod_factura =>41,   --
+        p_cod_repuesto => 23,  --
+        p_cantidad => 10
+    );
+END;
+
+------------------------    LEER   ---------------------------------------------
+CREATE OR REPLACE PROCEDURE get_detalle_factura (
+    p_id_detalle_factura IN DETALLE_FACTURA.ID_DETALLE_FACTURA%TYPE,
+    p_cod_factura OUT DETALLE_FACTURA.COD_FACTURA%TYPE,
+    p_cod_repuesto OUT DETALLE_FACTURA.COD_REPUESTO%TYPE,
+    p_cantidad OUT DETALLE_FACTURA.CANTIDAD%TYPE
+) AS
+BEGIN
+    SELECT COD_FACTURA, COD_REPUESTO, CANTIDAD
+    INTO p_cod_factura, p_cod_repuesto, p_cantidad
+    FROM DETALLE_FACTURA
+    WHERE ID_DETALLE_FACTURA = p_id_detalle_factura;
+
+    DBMS_OUTPUT.PUT_LINE('Detalle de factura encontrado correctamente');
+END;
+
+-- Usar procedure
+
+DECLARE
+    v_cod_factura DETALLE_FACTURA.COD_FACTURA%TYPE;
+    v_cod_repuesto DETALLE_FACTURA.COD_REPUESTO%TYPE;
+    v_cantidad DETALLE_FACTURA.CANTIDAD%TYPE;
+BEGIN
+    get_detalle_factura(
+        p_id_detalle_factura => 25,  -- Reemplaza con un ID_DETALLE_FACTURA existente
+        p_cod_factura => v_cod_factura,
+        p_cod_repuesto => v_cod_repuesto,
+        p_cantidad => v_cantidad
+    );
+    DBMS_OUTPUT.PUT_LINE('CÃ³digo de Factura: ' || v_cod_factura);
+    DBMS_OUTPUT.PUT_LINE('CÃ³digo de Repuesto: ' || v_cod_repuesto);
+    DBMS_OUTPUT.PUT_LINE('Cantidad: ' || v_cantidad);
+END;
+------------------------    ACTUALIZAR   ---------------------------------------
+CREATE OR REPLACE PROCEDURE update_detalle_factura (
+    p_id_detalle_factura IN DETALLE_FACTURA.ID_DETALLE_FACTURA%TYPE,
+    p_cod_factura IN DETALLE_FACTURA.COD_FACTURA%TYPE,
+    p_cod_repuesto IN DETALLE_FACTURA.COD_REPUESTO%TYPE,
+    p_cantidad IN DETALLE_FACTURA.CANTIDAD%TYPE
+) AS
+BEGIN
+    UPDATE DETALLE_FACTURA
+    SET COD_FACTURA = p_cod_factura,
+        COD_REPUESTO = p_cod_repuesto,
+        CANTIDAD = p_cantidad
+    WHERE ID_DETALLE_FACTURA = p_id_detalle_factura;
+
+    DBMS_OUTPUT.PUT_LINE('Detalle de factura actualizado correctamente');
+END;
+
+-- Usar procedure
+
+BEGIN
+    update_detalle_factura(
+        p_id_detalle_factura => 5,  -- 
+        p_cod_factura => 1,      --
+        p_cod_repuesto => 1,     -- 
+        p_cantidad => 32
+    );
+END;
+------------------------    ELIMINAR   -----------------------------------------
+
+CREATE OR REPLACE PROCEDURE delete_detalle_factura (
+    p_id_detalle_factura IN DETALLE_FACTURA.ID_DETALLE_FACTURA%TYPE
+) AS
+BEGIN
+    DELETE FROM DETALLE_FACTURA
+    WHERE ID_DETALLE_FACTURA = p_id_detalle_factura;
+    
+    DBMS_OUTPUT.PUT_LINE('Detalle de factura eliminado correctamente');
+END;
+
+-- Usar procedure
+
+BEGIN
+    delete_detalle_factura(
+        p_id_detalle_factura => 2  -- Reemplaza con un ID_DETALLE_FACTURA existente
+    );
+END;
+
+--------------------------    FACTURAS   ---------------------------------------
+SELECT * FROM OFICINAS;
+------------------------    CREAR   --------------------------------------------
+
+CREATE OR REPLACE PROCEDURE insert_oficina (
+    p_nombre_oficina IN OFICINAS.NOMBRE_OFICINA%TYPE,
+    p_fecha_registro IN OFICINAS.FECHA_REGISTRO%TYPE
+) AS
+BEGIN
+    INSERT INTO OFICINAS (NOMBRE_OFICINA, FECHA_REGISTRO)
+    VALUES (p_nombre_oficina, p_fecha_registro);
+    
+    DBMS_OUTPUT.PUT_LINE('Oficina insertada correctamente');
+END;
+
+-- Usar procedure
+
+BEGIN
+    insert_oficina(
+        p_nombre_oficina => 'Oficina Central',
+        p_fecha_registro => DATE '2024-07-23'
+    );
+END;
+------------------------    LEER   ---------------------------------------------
+
+CREATE OR REPLACE PROCEDURE get_oficina (
+    p_id_oficina IN OFICINAS.ID_OFICINA%TYPE,
+    p_nombre_oficina OUT OFICINAS.NOMBRE_OFICINA%TYPE,
+    p_fecha_registro OUT OFICINAS.FECHA_REGISTRO%TYPE
+) AS
+BEGIN
+    SELECT NOMBRE_OFICINA, FECHA_REGISTRO
+    INTO p_nombre_oficina, p_fecha_registro
+    FROM OFICINAS
+    WHERE ID_OFICINA = p_id_oficina;
+
+    DBMS_OUTPUT.PUT_LINE('Oficina encontrada correctamente');
+END;
+
+-- Usar procedure
+
+DECLARE
+    v_nombre_oficina OFICINAS.NOMBRE_OFICINA%TYPE;
+    v_fecha_registro OFICINAS.FECHA_REGISTRO%TYPE;
+BEGIN
+    get_oficina(
+        p_id_oficina => 1,  -- 
+        p_nombre_oficina => v_nombre_oficina,
+        p_fecha_registro => v_fecha_registro
+    );
+    DBMS_OUTPUT.PUT_LINE('Nombre de Oficina: ' || v_nombre_oficina);
+    DBMS_OUTPUT.PUT_LINE('Fecha de Registro: ' || v_fecha_registro);
+END;
+
+------------------------    ACTUALIZAR   ---------------------------------------
+
+CREATE OR REPLACE PROCEDURE update_oficina (
+    p_id_oficina IN OFICINAS.ID_OFICINA%TYPE,
+    p_nombre_oficina IN OFICINAS.NOMBRE_OFICINA%TYPE,
+    p_fecha_registro IN OFICINAS.FECHA_REGISTRO%TYPE
+) AS
+BEGIN
+    UPDATE OFICINAS
+    SET NOMBRE_OFICINA = p_nombre_oficina,
+        FECHA_REGISTRO = p_fecha_registro
+    WHERE ID_OFICINA = p_id_oficina;
+    
+    DBMS_OUTPUT.PUT_LINE('Oficina actualizada correctamente');
+END;
+
+-- Usar procedure
+
+BEGIN
+    update_oficina(
+        p_id_oficina => 1,  -- Reemplaza con un ID_OFICINA existente
+        p_nombre_oficina => 'Oficina Regional',
+        p_fecha_registro => DATE '2024-07-24'
+    );
+END;
+
+
+
+------------------------    ELIMINAR   -----------------------------------------
+CREATE OR REPLACE PROCEDURE delete_oficina (
+    p_id_oficina IN OFICINAS.ID_OFICINA%TYPE
+) AS
+BEGIN
+    DELETE FROM OFICINAS
+    WHERE ID_OFICINA = p_id_oficina;
+    
+    DBMS_OUTPUT.PUT_LINE('Oficina eliminada correctamente');
+END;
+
+-- Usar procedure
+
+BEGIN
+    delete_oficina(
+        p_id_oficina => 1  -- Reemplaza con un ID_OFICINA existente
+    );
+END;
+--------------------------    VEHICULOS   ---------------------------------------
+SELECT * FROM VEHICULOS;
+------------------------    CREAR   --------------------------------------------
+CREATE OR REPLACE PROCEDURE insert_vehiculo (
+    p_num_placa IN VEHICULOS.NUM_PLACA%TYPE,
+    p_tipo_vehiculo IN VEHICULOS.TIPO_VEHICULO%TYPE,
+    p_estado_vehiculo IN VEHICULOS.ESTADO_VEHICULO%TYPE,
+    p_marca IN VEHICULOS.MARCA%TYPE,
+    p_modelo IN VEHICULOS.MODELO%TYPE,
+    p_fecha_registro IN VEHICULOS.FECHA_REGISTRO%TYPE,
+    p_nombre_usuario IN VEHICULOS.NOMBRE_USUARIO%TYPE
+) AS
+BEGIN
+    INSERT INTO VEHICULOS (NUM_PLACA, TIPO_VEHICULO, ESTADO_VEHICULO, MARCA, MODELO, FECHA_REGISTRO, NOMBRE_USUARIO)
+    VALUES (p_num_placa, p_tipo_vehiculo, p_estado_vehiculo, p_marca, p_modelo, p_fecha_registro, p_nombre_usuario);
+    
+    DBMS_OUTPUT.PUT_LINE('VehÃ­culo insertado correctamente');
+END;
+-- Usar procedure
+BEGIN
+    insert_vehiculo(
+        p_num_placa => 'ABC123',
+        p_tipo_vehiculo => 'SUV',
+        p_estado_vehiculo => 'Nuevo',
+        p_marca => 'Toyota',
+        p_modelo => 'RAV4',
+        p_fecha_registro => DATE '2024-07-23',
+        p_nombre_usuario => 'Juan PÃ©rez'
+    );
+END;
+/
+
+
+------------------------    LEER   ---------------------------------------------
+CREATE OR REPLACE PROCEDURE get_vehiculo (
+    p_id_vehiculo IN VEHICULOS.ID_VEHICULO%TYPE,
+    p_num_placa OUT VEHICULOS.NUM_PLACA%TYPE,
+    p_tipo_vehiculo OUT VEHICULOS.TIPO_VEHICULO%TYPE,
+    p_estado_vehiculo OUT VEHICULOS.ESTADO_VEHICULO%TYPE,
+    p_marca OUT VEHICULOS.MARCA%TYPE,
+    p_modelo OUT VEHICULOS.MODELO%TYPE,
+    p_fecha_registro OUT VEHICULOS.FECHA_REGISTRO%TYPE,
+    p_nombre_usuario OUT VEHICULOS.NOMBRE_USUARIO%TYPE
+) AS
+BEGIN
+    SELECT NUM_PLACA, TIPO_VEHICULO, ESTADO_VEHICULO, MARCA, MODELO, FECHA_REGISTRO, NOMBRE_USUARIO
+    INTO p_num_placa, p_tipo_vehiculo, p_estado_vehiculo, p_marca, p_modelo, p_fecha_registro, p_nombre_usuario
+    FROM VEHICULOS
+    WHERE ID_VEHICULO = p_id_vehiculo;
+
+    DBMS_OUTPUT.PUT_LINE('VehÃ­culo encontrado correctamente');
+END;
+
+
+-- Usar procedure
+
+DECLARE
+    v_num_placa VEHICULOS.NUM_PLACA%TYPE;
+    v_tipo_vehiculo VEHICULOS.TIPO_VEHICULO%TYPE;
+    v_estado_vehiculo VEHICULOS.ESTADO_VEHICULO%TYPE;
+    v_marca VEHICULOS.MARCA%TYPE;
+    v_modelo VEHICULOS.MODELO%TYPE;
+    v_fecha_registro VEHICULOS.FECHA_REGISTRO%TYPE;
+    v_nombre_usuario VEHICULOS.NOMBRE_USUARIO%TYPE;
+BEGIN
+    get_vehiculo(
+        p_id_vehiculo => 1,  -- 
+        p_num_placa => v_num_placa,
+        p_tipo_vehiculo => v_tipo_vehiculo,
+        p_estado_vehiculo => v_estado_vehiculo,
+        p_marca => v_marca,
+        p_modelo => v_modelo,
+        p_fecha_registro => v_fecha_registro,
+        p_nombre_usuario => v_nombre_usuario
+    );
+    DBMS_OUTPUT.PUT_LINE('NÃºmero de Placa: ' || v_num_placa);
+    DBMS_OUTPUT.PUT_LINE('Tipo de VehÃ­culo: ' || v_tipo_vehiculo);
+    DBMS_OUTPUT.PUT_LINE('Estado del VehÃ­culo: ' || v_estado_vehiculo);
+    DBMS_OUTPUT.PUT_LINE('Marca: ' || v_marca);
+    DBMS_OUTPUT.PUT_LINE('Modelo: ' || v_modelo);
+    DBMS_OUTPUT.PUT_LINE('Fecha de Registro: ' || v_fecha_registro);
+    DBMS_OUTPUT.PUT_LINE('Nombre de Usuario: ' || v_nombre_usuario);
+END;
+
+------------------------    ACTUALIZAR   ---------------------------------------
+CREATE OR REPLACE PROCEDURE update_vehiculo (
+    p_id_vehiculo IN VEHICULOS.ID_VEHICULO%TYPE,
+    p_num_placa IN VEHICULOS.NUM_PLACA%TYPE,
+    p_tipo_vehiculo IN VEHICULOS.TIPO_VEHICULO%TYPE,
+    p_estado_vehiculo IN VEHICULOS.ESTADO_VEHICULO%TYPE,
+    p_marca IN VEHICULOS.MARCA%TYPE,
+    p_modelo IN VEHICULOS.MODELO%TYPE,
+    p_fecha_registro IN VEHICULOS.FECHA_REGISTRO%TYPE,
+    p_nombre_usuario IN VEHICULOS.NOMBRE_USUARIO%TYPE
+) AS
+BEGIN
+    UPDATE VEHICULOS
+    SET NUM_PLACA = p_num_placa,
+        TIPO_VEHICULO = p_tipo_vehiculo,
+        ESTADO_VEHICULO = p_estado_vehiculo,
+        MARCA = p_marca,
+        MODELO = p_modelo,
+        FECHA_REGISTRO = p_fecha_registro,
+        NOMBRE_USUARIO = p_nombre_usuario
+    WHERE ID_VEHICULO = p_id_vehiculo;
+    
+    DBMS_OUTPUT.PUT_LINE('VehÃ­culo actualizado correctamente');
+END;
+
+-- Usar procedure
+
+BEGIN
+    update_vehiculo(
+        p_id_vehiculo => 1,  -- Reemplaza con un ID_VEHICULO existente
+        p_num_placa => 'XYZ789',
+        p_tipo_vehiculo => 'SedÃ¡n',
+        p_estado_vehiculo => 'Usado',
+        p_marca => 'Honda',
+        p_modelo => 'Civic',
+        p_fecha_registro => DATE '2024-07-24',
+        p_nombre_usuario => 'Ana GarcÃ­a'
+    );
+END;
+
+
+BEGIN
+    update_vehiculo(
+        p_id_vehiculo => 1,  -- Reemplaza con un ID_VEHICULO existente
+        p_num_placa => 'XYZ789',
+        p_tipo_vehiculo => 'SedÃ¡n',
+        p_estado_vehiculo => 'Usado',
+        p_marca => 'Honda',
+        p_modelo => 'Civic',
+        p_fecha_registro => DATE '2024-07-24',
+        p_nombre_usuario => 'Ana GarcÃ­a'
+    );
+END;
+
+------------------------    ELIMINAR   -----------------------------------------
+CREATE OR REPLACE PROCEDURE delete_vehiculo (
+    p_id_vehiculo IN VEHICULOS.ID_VEHICULO%TYPE
+) AS
+BEGIN
+    DELETE FROM VEHICULOS
+    WHERE ID_VEHICULO = p_id_vehiculo;
+    
+    DBMS_OUTPUT.PUT_LINE('VehÃ­culo eliminado correctamente');
+END;
+
+-- Usar procedure
+
+BEGIN
+    delete_vehiculo(
+        p_id_vehiculo => 1  
+END;
+
+--------------------------    SERVICIOS   ---------------------------------------
+SELECT * FROM SERVICIOS;
+------------------------    CREAR   --------------------------------------------
+CREATE OR REPLACE PROCEDURE insert_servicio (
+    p_cod_servicio IN SERVICIOS.COD_SERVICIO%TYPE,
+    p_nombre_servicio IN SERVICIOS.NOMBRE_SERVICIO%TYPE,
+    p_descripcion_servicio IN SERVICIOS.DESCRIPCION_SERVICIO%TYPE,
+    p_precio_servicio IN SERVICIOS.PRECIO_SERVICIO%TYPE
+) AS
+BEGIN
+    INSERT INTO SERVICIOS (COD_SERVICIO, NOMBRE_SERVICIO, DESCRIPCION_SERVICIO, PRECIO_SERVICIO)
+    VALUES (p_cod_servicio, p_nombre_servicio, p_descripcion_servicio, p_precio_servicio);
+    
+    DBMS_OUTPUT.PUT_LINE('Servicio insertado correctamente');
+END;
+
+
+-- Usar procedure
+
+BEGIN
+    insert_servicio(
+        p_cod_servicio => 1001,
+        p_nombre_servicio => 'Lavado de Autos',
+        p_descripcion_servicio => 'Lavado exterior e interior de autos',
+        p_precio_servicio => 25.00
+    );
+END;
+
+
+
+
+------------------------    LEER   ---------------------------------------------
+CREATE OR REPLACE PROCEDURE get_servicio (
+    p_id_servicio IN SERVICIOS.ID_SERVICIO%TYPE,
+    p_cod_servicio OUT SERVICIOS.COD_SERVICIO%TYPE,
+    p_nombre_servicio OUT SERVICIOS.NOMBRE_SERVICIO%TYPE,
+    p_descripcion_servicio OUT SERVICIOS.DESCRIPCION_SERVICIO%TYPE,
+    p_precio_servicio OUT SERVICIOS.PRECIO_SERVICIO%TYPE
+) AS
+BEGIN
+    SELECT COD_SERVICIO, NOMBRE_SERVICIO, DESCRIPCION_SERVICIO, PRECIO_SERVICIO
+    INTO p_cod_servicio, p_nombre_servicio, p_descripcion_servicio, p_precio_servicio
+    FROM SERVICIOS
+    WHERE ID_SERVICIO = p_id_servicio;
+
+    DBMS_OUTPUT.PUT_LINE('Servicio encontrado correctamente');
+END;
+
+
+-- Usar procedure
+
+DECLARE
+    v_cod_servicio SERVICIOS.COD_SERVICIO%TYPE;
+    v_nombre_servicio SERVICIOS.NOMBRE_SERVICIO%TYPE;
+    v_descripcion_servicio SERVICIOS.DESCRIPCION_SERVICIO%TYPE;
+    v_precio_servicio SERVICIOS.PRECIO_SERVICIO%TYPE;
+BEGIN
+    get_servicio(
+        p_id_servicio => 1,  -- Reemplaza con un ID_SERVICIO existente
+        p_cod_servicio => v_cod_servicio,
+        p_nombre_servicio => v_nombre_servicio,
+        p_descripcion_servicio => v_descripcion_servicio,
+        p_precio_servicio => v_precio_servicio
+    );
+    DBMS_OUTPUT.PUT_LINE('CÃ³digo de Servicio: ' || v_cod_servicio);
+    DBMS_OUTPUT.PUT_LINE('Nombre de Servicio: ' || v_nombre_servicio);
+    DBMS_OUTPUT.PUT_LINE('DescripciÃ³n de Servicio: ' || v_descripcion_servicio);
+    DBMS_OUTPUT.PUT_LINE('Precio de Servicio: ' || v_precio_servicio);
+END;
+
+
+------------------------    ACTUALIZAR   ---------------------------------------
+CREATE OR REPLACE PROCEDURE update_servicio (
+    p_id_servicio IN SERVICIOS.ID_SERVICIO%TYPE,
+    p_cod_servicio IN SERVICIOS.COD_SERVICIO%TYPE,
+    p_nombre_servicio IN SERVICIOS.NOMBRE_SERVICIO%TYPE,
+    p_descripcion_servicio IN SERVICIOS.DESCRIPCION_SERVICIO%TYPE,
+    p_precio_servicio IN SERVICIOS.PRECIO_SERVICIO%TYPE
+) AS
+BEGIN
+    UPDATE SERVICIOS
+    SET COD_SERVICIO = p_cod_servicio,
+        NOMBRE_SERVICIO = p_nombre_servicio,
+        DESCRIPCION_SERVICIO = p_descripcion_servicio,
+        PRECIO_SERVICIO = p_precio_servicio
+    WHERE ID_SERVICIO = p_id_servicio;
+    
+    DBMS_OUTPUT.PUT_LINE('Servicio actualizado correctamente');
+END;
+
+
+
+-- Usar procedure
+
+BEGIN
+    update_servicio(
+        p_id_servicio => 5,  -- Reemplaza con un ID_SERVICIO existente
+        p_cod_servicio => 1002,
+        p_nombre_servicio => 'Cambio de Aceite',
+        p_descripcion_servicio => 'Cambio de aceite para todo tipo de vehÃ­culos',
+        p_precio_servicio => 50.00
+    );
+END;
+
+
+------------------------    ELIMINAR   -----------------------------------------
+CREATE OR REPLACE PROCEDURE delete_servicio (
+    p_id_servicio IN SERVICIOS.ID_SERVICIO%TYPE
+) AS
+BEGIN
+    DELETE FROM SERVICIOS
+    WHERE ID_SERVICIO = p_id_servicio;
+    
+    DBMS_OUTPUT.PUT_LINE('Servicio eliminado correctamente');
+END;
+
+
+-- Usar procedure
+
+BEGIN
+    delete_servicio(
+        p_id_servicio => 1  -- Reemplaza con un ID_SERVICIO existente
+    );
+END;
+--------------------------    EMPLEADOS   ---------------------------------------
+SELECT * FROM EMPLEADOS;
+------------------------    CREAR   --------------------------------------------
+CREATE OR REPLACE PROCEDURE insert_empleado (
+    p_nombre_empleado IN EMPLEADOS.NOMBRE_EMPLEADO%TYPE,
+    p_apellido_empleado IN EMPLEADOS.APELLIDO_EMPLEADO%TYPE,
+    p_cargo_empleado IN EMPLEADOS.CARGO_EMPLEADO%TYPE,
+    p_fecha_contratacion IN EMPLEADOS.FECHA_CONTRATACION%TYPE,
+    p_salario IN EMPLEADOS.SALARIO%TYPE
+) AS
+BEGIN
+    INSERT INTO EMPLEADOS (NOMBRE_EMPLEADO, APELLIDO_EMPLEADO, CARGO_EMPLEADO, FECHA_CONTRATACION, SALARIO)
+    VALUES (p_nombre_empleado, p_apellido_empleado, p_cargo_empleado, p_fecha_contratacion, p_salario);
+    
+    DBMS_OUTPUT.PUT_LINE('Empleado insertado correctamente');
+END;
+
+
+
+-- Usar procedure
+
+BEGIN
+    insert_empleado(
+        p_nombre_empleado => 'Carlos',
+        p_apellido_empleado => 'GÃ³mez',
+        p_cargo_empleado => 'Gerente',
+        p_fecha_contratacion => DATE '2024-07-23',
+        p_salario => 5000.00
+    );
+END;
+
+
+
+
+
+
+------------------------    LEER   ---------------------------------------------
+CREATE OR REPLACE PROCEDURE get_empleado (
+    p_id_empleado IN EMPLEADOS.ID_EMPLEADO%TYPE,
+    p_nombre_empleado OUT EMPLEADOS.NOMBRE_EMPLEADO%TYPE,
+    p_apellido_empleado OUT EMPLEADOS.APELLIDO_EMPLEADO%TYPE,
+    p_cargo_empleado OUT EMPLEADOS.CARGO_EMPLEADO%TYPE,
+    p_fecha_contratacion OUT EMPLEADOS.FECHA_CONTRATACION%TYPE,
+    p_salario OUT EMPLEADOS.SALARIO%TYPE
+) AS
+BEGIN
+    SELECT NOMBRE_EMPLEADO, APELLIDO_EMPLEADO, CARGO_EMPLEADO, FECHA_CONTRATACION, SALARIO
+    INTO p_nombre_empleado, p_apellido_empleado, p_cargo_empleado, p_fecha_contratacion, p_salario
+    FROM EMPLEADOS
+    WHERE ID_EMPLEADO = p_id_empleado;
+
+    DBMS_OUTPUT.PUT_LINE('Empleado encontrado correctamente');
+END;
+/
+
+
+-- Usar procedure
+
+DECLARE
+    v_nombre_empleado EMPLEADOS.NOMBRE_EMPLEADO%TYPE;
+    v_apellido_empleado EMPLEADOS.APELLIDO_EMPLEADO%TYPE;
+    v_cargo_empleado EMPLEADOS.CARGO_EMPLEADO%TYPE;
+    v_fecha_contratacion EMPLEADOS.FECHA_CONTRATACION%TYPE;
+    v_salario EMPLEADOS.SALARIO%TYPE;
+BEGIN
+    get_empleado(
+        p_id_empleado => 1,  -- Reemplaza con un ID_EMPLEADO existente
+        p_nombre_empleado => v_nombre_empleado,
+        p_apellido_empleado => v_apellido_empleado,
+        p_cargo_empleado => v_cargo_empleado,
+        p_fecha_contratacion => v_fecha_contratacion,
+        p_salario => v_salario
+    );
+    DBMS_OUTPUT.PUT_LINE('Nombre del Empleado: ' || v_nombre_empleado);
+    DBMS_OUTPUT.PUT_LINE('Apellido del Empleado: ' || v_apellido_empleado);
+    DBMS_OUTPUT.PUT_LINE('Cargo del Empleado: ' || v_cargo_empleado);
+    DBMS_OUTPUT.PUT_LINE('Fecha de ContrataciÃ³n: ' || v_fecha_contratacion);
+    DBMS_OUTPUT.PUT_LINE('Salario: ' || v_salario);
+END;
+
+
+
+
+------------------------    ACTUALIZAR   ---------------------------------------
+CREATE OR REPLACE PROCEDURE update_empleado (
+    p_id_empleado IN EMPLEADOS.ID_EMPLEADO%TYPE,
+    p_nombre_empleado IN EMPLEADOS.NOMBRE_EMPLEADO%TYPE,
+    p_apellido_empleado IN EMPLEADOS.APELLIDO_EMPLEADO%TYPE,
+    p_cargo_empleado IN EMPLEADOS.CARGO_EMPLEADO%TYPE,
+    p_fecha_contratacion IN EMPLEADOS.FECHA_CONTRATACION%TYPE,
+    p_salario IN EMPLEADOS.SALARIO%TYPE
+) AS
+BEGIN
+    UPDATE EMPLEADOS
+    SET NOMBRE_EMPLEADO = p_nombre_empleado,
+        APELLIDO_EMPLEADO = p_apellido_empleado,
+        CARGO_EMPLEADO = p_cargo_empleado,
+        FECHA_CONTRATACION = p_fecha_contratacion,
+        SALARIO = p_salario
+    WHERE ID_EMPLEADO = p_id_empleado;
+    
+    DBMS_OUTPUT.PUT_LINE('Empleado actualizado correctamente');
+END;
+
+
+-- Usar procedure
+
+BEGIN
+    update_empleado(
+        p_id_empleado => 5,  -- Reemplaza con un ID_EMPLEADO existente
+        p_nombre_empleado => 'Sebastian',
+        p_apellido_empleado => 'Hernandez',
+        p_cargo_empleado => 'Jimenez',
+        p_fecha_contratacion => DATE '2024-07-24',
+        p_salario => 10500.00
+    );
+END;
+
+
+
+------------------------    ELIMINAR   -----------------------------------------
+CREATE OR REPLACE PROCEDURE delete_empleado (
+    p_id_empleado IN EMPLEADOS.ID_EMPLEADO%TYPE
+) AS
+BEGIN
+    DELETE FROM EMPLEADOS
+    WHERE ID_EMPLEADO = p_id_empleado;
+    
+    DBMS_OUTPUT.PUT_LINE('Empleado eliminado correctamente');
+END;
+
+
+-- Usar procedure
+
+BEGIN
+
+    delete_empleado(
+        p_id_empleado => 21  -- Reemplaza con un ID_EMPLEADO existente
+    );
+END;
+
+
+
+/*
+**********************************************************************
+*                                                                    *
+*                             FUNCIONES                              *
+*                                                                    *
+**********************************************************************
+*/
+
+--------------------------Dani----------------------------------------
+
+-- Habilitar la salida de DBMS_OUTPUT para la primera funciï¿½n
 SET SERVEROUTPUT ON;
 
--- Función para calcular el total de una factura
+-- Funciï¿½n para calcular el total de una factura
 CREATE OR REPLACE FUNCTION calcular_total_factura(p_id_factura IN INTEGER)
 RETURN NUMBER IS
     v_total NUMBER(10, 2);
@@ -659,24 +1314,24 @@ EXCEPTION
         DBMS_OUTPUT.PUT_LINE('No se encontraron datos para la factura ' || p_id_factura);
         RETURN 0;
     WHEN OTHERS THEN
-        DBMS_OUTPUT.PUT_LINE('Ocurrió un error al calcular el total de la factura ' || p_id_factura);
+        DBMS_OUTPUT.PUT_LINE('Ocurriï¿½ un error al calcular el total de la factura ' || p_id_factura);
         RETURN -1;
 END;
 /
 
--- Llamada a la función calcular_total_factura
+-- Llamada a la funciï¿½n calcular_total_factura
 DECLARE
     v_total NUMBER;
 BEGIN
-    v_total := calcular_total_factura(2); -- Aqui hay que cambiar el ID de la factura según sea necesario
-    DBMS_OUTPUT.PUT_LINE('Resultado de la función calcular_total_factura: ' || v_total);
+    v_total := calcular_total_factura(2); -- Aqui hay que cambiar el ID de la factura segï¿½n sea necesario
+    DBMS_OUTPUT.PUT_LINE('Resultado de la funciï¿½n calcular_total_factura: ' || v_total);
 END;
 /
 
--- Habilitar la salida de DBMS_OUTPUT para la función
+-- Habilitar la salida de DBMS_OUTPUT para la funciï¿½n
 SET SERVEROUTPUT ON;
 
--- Función para calcular el total de todas las facturas
+-- Funciï¿½n para calcular el total de todas las facturas
 CREATE OR REPLACE FUNCTION calcular_total_facturas
 RETURN NUMBER IS
     v_total NUMBER(10, 2);
@@ -694,19 +1349,19 @@ EXCEPTION
 END;
 /
 
--- Llamada a la función calcular_total_facturas
+-- Llamada a la funciï¿½n calcular_total_facturas
 DECLARE
     v_total NUMBER;
 BEGIN
     v_total := calcular_total_facturas();
-    DBMS_OUTPUT.PUT_LINE('Resultado de la función calcular_total_facturas: ' || v_total);
+    DBMS_OUTPUT.PUT_LINE('Resultado de la funciï¿½n calcular_total_facturas: ' || v_total);
 END;
 /
 
--- Habilitar la salida de DBMS_OUTPUT para la función
+-- Habilitar la salida de DBMS_OUTPUT para la funciï¿½n
 SET SERVEROUTPUT ON;
 
--- Función para obtener el total de los servicios de una oficina
+-- Funciï¿½n para obtener el total de los servicios de una oficina
 CREATE OR REPLACE FUNCTION total_servicios_oficina(p_id_oficina IN INTEGER)
 RETURN NUMBER IS
     v_total NUMBER(10, 2);
@@ -727,19 +1382,19 @@ EXCEPTION
 END;
 /
 
--- Llamada a la función total_servicios_oficina
+-- Llamada a la funciï¿½n total_servicios_oficina
 DECLARE
     v_total NUMBER;
 BEGIN
-    v_total := total_servicios_oficina(1); -- Cambiar el ID de la oficina según sea necesario
-    DBMS_OUTPUT.PUT_LINE('Resultado de la función total_servicios_oficina: ' || v_total);
+    v_total := total_servicios_oficina(1); -- Cambiar el ID de la oficina segï¿½n sea necesario
+    DBMS_OUTPUT.PUT_LINE('Resultado de la funciï¿½n total_servicios_oficina: ' || v_total);
 END;
 /
 
--- Habilitar la salida de DBMS_OUTPUT para la función
+-- Habilitar la salida de DBMS_OUTPUT para la funciï¿½n
 SET SERVEROUTPUT ON;
 
--- Función para obtener los detalles de una factura específica
+-- Funciï¿½n para obtener los detalles de una factura especï¿½fica
 CREATE OR REPLACE FUNCTION obtener_detalle_factura(p_id_factura IN INTEGER)
 RETURN SYS_REFCURSOR IS
     v_cursor SYS_REFCURSOR;
@@ -758,7 +1413,7 @@ EXCEPTION
 END;
 /
 
--- Llamada a la función obtener_detalle_factura
+-- Llamada a la funciï¿½n obtener_detalle_factura
 DECLARE
     v_cursor SYS_REFCURSOR;
     v_cod_repuesto REPUESTOS.COD_REPUESTO%TYPE;
@@ -766,13 +1421,13 @@ DECLARE
     v_cantidad DETALLE_FACTURA.CANTIDAD%TYPE;
     v_precio_repuesto REPUESTOS.PRECIO_REPUESTO%TYPE;
 BEGIN
-    v_cursor := obtener_detalle_factura(1); -- Se debe modificar el ID de la factura según sea necesario
+    v_cursor := obtener_detalle_factura(1); -- Se debe modificar el ID de la factura segï¿½n sea necesario
     
     LOOP
         FETCH v_cursor INTO v_cod_repuesto, v_nombre_repuesto, v_cantidad, v_precio_repuesto;
         EXIT WHEN v_cursor%NOTFOUND;
         
-        DBMS_OUTPUT.PUT_LINE('Código Repuesto: ' || v_cod_repuesto || ', Nombre: ' || v_nombre_repuesto || 
+        DBMS_OUTPUT.PUT_LINE('Cï¿½digo Repuesto: ' || v_cod_repuesto || ', Nombre: ' || v_nombre_repuesto || 
                              ', Cantidad: ' || v_cantidad || ', Precio: ' || v_precio_repuesto);
     END LOOP;
     
@@ -780,10 +1435,10 @@ BEGIN
 END;
 /
 
--- Habilitar la salida de DBMS_OUTPUT para la función 
+-- Habilitar la salida de DBMS_OUTPUT para la funciï¿½n 
 SET SERVEROUTPUT ON;
 
--- Función para obtener el contacto con más facturas
+-- Funciï¿½n para obtener el contacto con mï¿½s facturas
 CREATE OR REPLACE FUNCTION obtener_contacto_mas_facturas
 RETURN VARCHAR2 IS
     v_nombre_contacto CONTACTOS.NOMBRE_CONTACTO%TYPE;
@@ -801,23 +1456,23 @@ EXCEPTION
     WHEN NO_DATA_FOUND THEN
         RETURN 'No se encontraron contactos.';
     WHEN OTHERS THEN
-        RETURN 'Ocurrió un error al obtener el contacto.';
+        RETURN 'Ocurriï¿½ un error al obtener el contacto.';
 END;
 /
 
--- Llamada a la función obtener_contacto_mas_facturas
+-- Llamada a la funciï¿½n obtener_contacto_mas_facturas
 DECLARE
     v_contacto VARCHAR2(100);
 BEGIN
     v_contacto := obtener_contacto_mas_facturas();
-    DBMS_OUTPUT.PUT_LINE('Contacto con más facturas: ' || v_contacto);
+    DBMS_OUTPUT.PUT_LINE('Contacto con mï¿½s facturas: ' || v_contacto);
 END;
 /
 
--- Habilitar la salida de DBMS_OUTPUT para la función 
+-- Habilitar la salida de DBMS_OUTPUT para la funciï¿½n 
 SET SERVEROUTPUT ON;
 
--- Función para calcular el total de ventas de un repuesto
+-- Funciï¿½n para calcular el total de ventas de un repuesto
 CREATE OR REPLACE FUNCTION total_ventas_repuesto(p_cod_repuesto IN INTEGER)
 RETURN NUMBER IS
     v_total_ventas NUMBER(10, 2);
@@ -837,19 +1492,19 @@ EXCEPTION
 END;
 /
 
--- Llamada a la función total_ventas_repuesto
+-- Llamada a la funciï¿½n total_ventas_repuesto
 DECLARE
     v_total_ventas NUMBER;
 BEGIN
-    v_total_ventas := total_ventas_repuesto(301); -- Cambiar el código del repuesto según sea necesario
+    v_total_ventas := total_ventas_repuesto(301); -- Cambiar el cï¿½digo del repuesto segï¿½n sea necesario
     DBMS_OUTPUT.PUT_LINE('Total de ventas del repuesto: ' || v_total_ventas);
 END;
 /
 
--- Habilitar la salida de DBMS_OUTPUT para la función 
+-- Habilitar la salida de DBMS_OUTPUT para la funciï¿½n 
 SET SERVEROUTPUT ON;
 
--- Función para contar el número de vehículos activos
+-- Funciï¿½n para contar el nï¿½mero de vehï¿½culos activos
 CREATE OR REPLACE FUNCTION contar_vehiculos_activos
 RETURN INTEGER IS
     v_num_vehiculos INTEGER;
@@ -866,19 +1521,19 @@ EXCEPTION
 END;
 /
 
--- Llamada a la función contar_vehiculos_activos
+-- Llamada a la funciï¿½n contar_vehiculos_activos
 DECLARE
     v_num_vehiculos INTEGER;
 BEGIN
     v_num_vehiculos := contar_vehiculos_activos();
-    DBMS_OUTPUT.PUT_LINE('Número de vehículos activos: ' || v_num_vehiculos);
+    DBMS_OUTPUT.PUT_LINE('Nï¿½mero de vehï¿½culos activos: ' || v_num_vehiculos);
 END;
 /
 
--- Habilitar la salida de DBMS_OUTPUT para la función 
+-- Habilitar la salida de DBMS_OUTPUT para la funciï¿½n 
 SET SERVEROUTPUT ON;
 
--- Función para obtener el precio promedio de los servicios
+-- Funciï¿½n para obtener el precio promedio de los servicios
 CREATE OR REPLACE FUNCTION obtener_precio_promedio_servicios
 RETURN NUMBER IS
     v_precio_promedio NUMBER(10, 2);
@@ -896,7 +1551,7 @@ EXCEPTION
 END;
 /
 
--- Llamada a la función obtener_precio_promedio_servicios
+-- Llamada a la funciï¿½n obtener_precio_promedio_servicios
 DECLARE
     v_precio_promedio NUMBER;
 BEGIN
@@ -905,10 +1560,10 @@ BEGIN
 END;
 /
 
--- Habilitar la salida de DBMS_OUTPUT para la función 
+-- Habilitar la salida de DBMS_OUTPUT para la funciï¿½n 
 SET SERVEROUTPUT ON;
 
--- Función para obtener el número de empleados en cada cargo
+-- Funciï¿½n para obtener el nï¿½mero de empleados en cada cargo
 CREATE OR REPLACE FUNCTION obtener_empleados_por_cargo(p_cargo_empleado IN VARCHAR2)
 RETURN INTEGER IS
     v_num_empleados INTEGER;
@@ -927,11 +1582,19 @@ EXCEPTION
 END;
 /
 
--- Llamada a la función obtener_empleados_por_cargo
+-- Llamada a la funciï¿½n obtener_empleados_por_cargo
 DECLARE
     v_num_empleados INTEGER;
 BEGIN
-    v_num_empleados := obtener_empleados_por_cargo('Contador'); -- Se debe de modificar el cargo según sea necesario
-    DBMS_OUTPUT.PUT_LINE('Número de empleados en el cargo de Contador: ' || v_num_empleados);
+    v_num_empleados := obtener_empleados_por_cargo('Contador'); -- Se debe de modificar el cargo segï¿½n sea necesario
+    DBMS_OUTPUT.PUT_LINE('Nï¿½mero de empleados en el cargo de Contador: ' || v_num_empleados);
 END;
-/
+
+
+/*
+**********************************************************************
+*                                                                    *
+*                             VISTAS                                 *
+*                                                                    *
+**********************************************************************
+*/
