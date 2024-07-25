@@ -1598,6 +1598,171 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE('Nï¿½mero de empleados en el cargo de Contador: ' || v_num_empleados);
 END;
 
+/*
+**********************************************************************
+*                                                                    *
+*                             PROCEDIMIENTOS                         *
+*                                                                    *
+**********************************************************************
+*/
+--1.
+CREATE OR REPLACE PROCEDURE select_contactos_por_tipo (
+    p_tipo_contacto IN CONTACTOS.TIPO_CONTACTO%TYPE
+) AS
+BEGIN
+    FOR r IN (SELECT * FROM CONTACTOS WHERE TIPO_CONTACTO = p_tipo_contacto) LOOP
+        DBMS_OUTPUT.PUT_LINE('ID: ' || r.ID_CONTACTO || ', Nombre: ' || r.NOMBRE_CONTACTO);
+    END LOOP;
+END;
+/
+--2.
+CREATE OR REPLACE PROCEDURE select_facturas_por_cliente (
+    p_cod_cliente IN FACTURAS.COD_CLIENTE%TYPE
+) AS
+BEGIN
+    FOR r IN (SELECT * FROM FACTURAS WHERE COD_CLIENTE = p_cod_cliente) LOOP
+        DBMS_OUTPUT.PUT_LINE('ID Factura: ' || r.ID_FACTURA || ', Total: ' || r.TOTAL_FACTURA);
+    END LOOP;
+END;
+/
+--3.
+CREATE OR REPLACE PROCEDURE select_repuestos_por_fecha (
+    p_fecha_registro IN REPUESTOS.FECHA_REGISTRO%TYPE
+) AS
+BEGIN
+    FOR r IN (SELECT * FROM REPUESTOS WHERE FECHA_REGISTRO = p_fecha_registro) LOOP
+        DBMS_OUTPUT.PUT_LINE('ID Repuesto: ' || r.ID_REPUESTO || ', Nombre: ' || r.NOMBRE_REPUESTO);
+    END LOOP;
+END;
+/
+--4.
+CREATE OR REPLACE PROCEDURE select_detalle_por_factura (
+    p_cod_factura IN DETALLE_FACTURA.COD_FACTURA%TYPE
+) AS
+BEGIN
+    FOR r IN (SELECT * FROM DETALLE_FACTURA WHERE COD_FACTURA = p_cod_factura) LOOP
+        DBMS_OUTPUT.PUT_LINE('ID Detalle: ' || r.ID_DETALLE_FACTURA || ', Cantidad: ' || r.CANTIDAD);
+    END LOOP;
+END;
+/
+--5. 
+CREATE OR REPLACE PROCEDURE select_oficinas_por_nombre (
+    p_nombre_oficina IN OFICINAS.NOMBRE_OFICINA%TYPE
+) AS
+BEGIN
+    FOR r IN (SELECT * FROM OFICINAS WHERE NOMBRE_OFICINA = p_nombre_oficina) LOOP
+        DBMS_OUTPUT.PUT_LINE('ID Oficina: ' || r.ID_OFICINA || ', Nombre: ' || r.NOMBRE_OFICINA);
+    END LOOP;
+END;
+/
+--6.
+CREATE OR REPLACE PROCEDURE select_vehiculos_por_estado (
+    p_estado_vehiculo IN VEHICULOS.ESTADO_VEHICULO%TYPE
+) AS
+BEGIN
+    FOR r IN (SELECT * FROM VEHICULOS WHERE ESTADO_VEHICULO = p_estado_vehiculo) LOOP
+        DBMS_OUTPUT.PUT_LINE('ID Vehículo: ' || r.ID_VEHICULO || ', Placa: ' || r.NUM_PLACA);
+    END LOOP;
+END;
+/
+
+--7.
+CREATE OR REPLACE PROCEDURE select_servicios_por_precio (
+    p_precio_servicio IN SERVICIOS.PRECIO_SERVICIO%TYPE
+) AS
+BEGIN
+    FOR r IN (SELECT * FROM SERVICIOS WHERE PRECIO_SERVICIO = p_precio_servicio) LOOP
+        DBMS_OUTPUT.PUT_LINE('ID Servicio: ' || r.ID_SERVICIO || ', Nombre: ' || r.NOMBRE_SERVICIO);
+    END LOOP;
+END;
+/
+
+--8.
+CREATE OR REPLACE PROCEDURE select_empleados_por_cargo (
+    p_cargo_empleado IN EMPLEADOS.CARGO_EMPLEADO%TYPE
+) AS
+BEGIN
+    FOR r IN (SELECT * FROM EMPLEADOS WHERE CARGO_EMPLEADO = p_cargo_empleado) LOOP
+        DBMS_OUTPUT.PUT_LINE('ID Empleado: ' || r.ID_EMPLEADO || ', Nombre: ' || r.NOMBRE_EMPLEADO);
+    END LOOP;
+END;
+/
+
+--9. 
+CREATE OR REPLACE PROCEDURE select_contactos_por_nombre (
+    p_nombre_contacto IN CONTACTOS.NOMBRE_CONTACTO%TYPE
+) AS
+BEGIN
+    FOR r IN (SELECT * FROM CONTACTOS WHERE NOMBRE_CONTACTO = p_nombre_contacto) LOOP
+        DBMS_OUTPUT.PUT_LINE('ID: ' || r.ID_CONTACTO || ', Tipo: ' || r.TIPO_CONTACTO);
+    END LOOP;
+END;
+/
+
+--10.
+CREATE OR REPLACE PROCEDURE select_facturas_por_fecha (
+    p_fecha_factura IN FACTURAS.FECHA_FACTURA%TYPE
+) AS
+BEGIN
+    FOR r IN (SELECT * FROM FACTURAS WHERE FECHA_FACTURA = p_fecha_factura) LOOP
+        DBMS_OUTPUT.PUT_LINE('ID Factura: ' || r.ID_FACTURA || ', Cliente: ' || r.COD_CLIENTE);
+    END LOOP;
+END;
+/
+
+--11.
+CREATE OR REPLACE PROCEDURE select_repuestos_por_nombre (
+    p_nombre_repuesto IN REPUESTOS.NOMBRE_REPUESTO%TYPE
+) AS
+BEGIN
+    FOR r IN (SELECT * FROM REPUESTOS WHERE NOMBRE_REPUESTO = p_nombre_repuesto) LOOP
+        DBMS_OUTPUT.PUT_LINE('ID Repuesto: ' || r.ID_REPUESTO || ', Fecha Registro: ' || r.FECHA_REGISTRO);
+    END LOOP;
+END;
+/
+
+--12.
+CREATE OR REPLACE PROCEDURE select_detalle_por_repuesto (
+    p_cod_repuesto IN DETALLE_FACTURA.COD_REPUESTO%TYPE
+) AS
+BEGIN
+    FOR r IN (SELECT * FROM DETALLE_FACTURA WHERE COD_REPUESTO = p_cod_repuesto) LOOP
+        DBMS_OUTPUT.PUT_LINE('ID Detalle: ' || r.ID_DETALLE_FACTURA || ', Cantidad: ' || r.CANTIDAD);
+    END LOOP;
+END;
+/
+
+--13. 
+CREATE OR REPLACE PROCEDURE select_oficinas_por_fecha (
+    p_fecha_registro IN OFICINAS.FECHA_REGISTRO%TYPE
+) AS
+BEGIN
+    FOR r IN (SELECT * FROM OFICINAS WHERE FECHA_REGISTRO = p_fecha_registro) LOOP
+        DBMS_OUTPUT.PUT_LINE('ID Oficina: ' || r.ID_OFICINA || ', Nombre: ' || r.NOMBRE_OFICINA);
+    END LOOP;
+END;
+/
+--14.
+CREATE OR REPLACE PROCEDURE select_vehiculos_por_tipo (
+    p_tipo_vehiculo IN VEHICULOS.TIPO_VEHICULO%TYPE
+) AS
+BEGIN
+    FOR r IN (SELECT * FROM VEHICULOS WHERE TIPO_VEHICULO = p_tipo_vehiculo) LOOP
+        DBMS_OUTPUT.PUT_LINE('ID Vehículo: ' || r.ID_VEHICULO || ', Placa: ' || r.NUM_PLACA);
+    END LOOP;
+END;
+/
+
+--15.
+CREATE OR REPLACE PROCEDURE select_servicios_por_nombre (
+    p_nombre_servicio IN SERVICIOS.NOMBRE_SERVICIO%TYPE
+) AS
+BEGIN
+    FOR r IN (SELECT * FROM SERVICIOS WHERE NOMBRE_SERVICIO = p_nombre_servicio) LOOP
+        DBMS_OUTPUT.PUT_LINE('ID Servicio: ' || r.ID_SERVICIO || ', Precio: ' || r.PRECIO_SERVICIO);
+    END LOOP;
+END;
+/ 
 
 /*
 **********************************************************************
