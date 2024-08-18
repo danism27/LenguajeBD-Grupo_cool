@@ -2570,3 +2570,202 @@ CREATE OR REPLACE PACKAGE BODY servicios_empleados_pkg AS
     END;
 END servicios_empleados_pkg;
 /
+
+CREATE OR REPLACE PACKAGE oficinas_pkg AS
+    PROCEDURE select_oficinas_por_nombre(p_nombre_oficina IN OFICINAS.NOMBRE_OFICINA%TYPE);
+    PROCEDURE select_oficinas_por_fecha(p_fecha_registro IN OFICINAS.FECHA_REGISTRO%TYPE);
+    FUNCTION obtener_oficinas RETURN SYS_REFCURSOR;
+END oficinas_pkg;
+
+
+CREATE OR REPLACE PACKAGE BODY oficinas_pkg AS
+    PROCEDURE select_oficinas_por_nombre(p_nombre_oficina IN OFICINAS.NOMBRE_OFICINA%TYPE) AS
+    BEGIN
+        FOR r IN (SELECT * FROM OFICINAS WHERE NOMBRE_OFICINA = p_nombre_oficina) LOOP
+            DBMS_OUTPUT.PUT_LINE('ID Oficina: ' || r.ID_OFICINA || ', Nombre: ' || r.NOMBRE_OFICINA);
+        END LOOP;
+    END;
+
+    PROCEDURE select_oficinas_por_fecha(p_fecha_registro IN OFICINAS.FECHA_REGISTRO%TYPE) AS
+    BEGIN
+        FOR r IN (SELECT * FROM OFICINAS WHERE FECHA_REGISTRO = p_fecha_registro) LOOP
+            DBMS_OUTPUT.PUT_LINE('ID Oficina: ' || r.ID_OFICINA || ', Nombre: ' || r.NOMBRE_OFICINA);
+        END LOOP;
+    END;
+
+    FUNCTION obtener_oficinas RETURN SYS_REFCURSOR IS
+        v_cursor SYS_REFCURSOR;
+    BEGIN
+        OPEN v_cursor FOR SELECT * FROM OFICINAS;
+        RETURN v_cursor;
+    END;
+END oficinas_pkg;
+
+
+
+CREATE OR REPLACE PACKAGE detalle_factura_pkg AS
+    PROCEDURE select_detalle_por_factura(p_cod_factura IN DETALLE_FACTURA.COD_FACTURA%TYPE);
+    PROCEDURE select_detalle_por_repuesto(p_cod_repuesto IN DETALLE_FACTURA.COD_REPUESTO%TYPE);
+    FUNCTION obtener_detalle_factura(p_id_factura IN INTEGER) RETURN SYS_REFCURSOR;
+END detalle_factura_pkg;
+
+
+CREATE OR REPLACE PACKAGE BODY detalle_factura_pkg AS
+    PROCEDURE select_detalle_por_factura(p_cod_factura IN DETALLE_FACTURA.COD_FACTURA%TYPE) AS
+    BEGIN
+        FOR r IN (SELECT * FROM DETALLE_FACTURA WHERE COD_FACTURA = p_cod_factura) LOOP
+            DBMS_OUTPUT.PUT_LINE('ID Detalle: ' || r.ID_DETALLE_FACTURA || ', Cantidad: ' || r.CANTIDAD);
+        END LOOP;
+    END;
+
+    PROCEDURE select_detalle_por_repuesto(p_cod_repuesto IN DETALLE_FACTURA.COD_REPUESTO%TYPE) AS
+    BEGIN
+        FOR r IN (SELECT * FROM DETALLE_FACTURA WHERE COD_REPUESTO = p_cod_repuesto) LOOP
+            DBMS_OUTPUT.PUT_LINE('ID Detalle: ' || r.ID_DETALLE_FACTURA || ', Cantidad: ' || r.CANTIDAD);
+        END LOOP;
+    END;
+
+    FUNCTION obtener_detalle_factura(p_id_factura IN INTEGER) RETURN SYS_REFCURSOR IS
+        v_cursor SYS_REFCURSOR;
+    BEGIN
+        OPEN v_cursor FOR
+            SELECT df.COD_REPUESTO, r.NOMBRE_REPUESTO, df.CANTIDAD, r.PRECIO_REPUESTO
+            FROM DETALLE_FACTURA df
+            JOIN REPUESTOS r ON df.COD_REPUESTO = r.ID_REPUESTO
+            WHERE df.COD_FACTURA = p_id_factura;
+        RETURN v_cursor;
+    END;
+END detalle_factura_pkg;
+
+
+
+CREATE OR REPLACE PACKAGE servicios_pkg AS
+    PROCEDURE select_servicios_por_precio(p_precio_servicio IN SERVICIOS.PRECIO_SERVICIO%TYPE);
+    PROCEDURE select_servicios_por_nombre(p_nombre_servicio IN SERVICIOS.NOMBRE_SERVICIO%TYPE);
+    FUNCTION obtener_servicios RETURN SYS_REFCURSOR;
+END servicios_pkg;
+
+
+CREATE OR REPLACE PACKAGE BODY servicios_pkg AS
+    PROCEDURE select_servicios_por_precio(p_precio_servicio IN SERVICIOS.PRECIO_SERVICIO%TYPE) AS
+    BEGIN
+        FOR r IN (SELECT * FROM SERVICIOS WHERE PRECIO_SERVICIO = p_precio_servicio) LOOP
+            DBMS_OUTPUT.PUT_LINE('ID Servicio: ' || r.COD_SERVICIO || ', Nombre: ' || r.NOMBRE_SERVICIO);
+        END LOOP;
+    END;
+
+    PROCEDURE select_servicios_por_nombre(p_nombre_servicio IN SERVICIOS.NOMBRE_SERVICIO%TYPE) AS
+    BEGIN
+        FOR r IN (SELECT * FROM SERVICIOS WHERE NOMBRE_SERVICIO = p_nombre_servicio) LOOP
+            DBMS_OUTPUT.PUT_LINE('ID Servicio: ' || r.COD_SERVICIO || ', Precio: ' || r.PRECIO_SERVICIO);
+        END LOOP;
+    END;
+
+    FUNCTION obtener_servicios RETURN SYS_REFCURSOR IS
+        v_cursor SYS_REFCURSOR;
+    BEGIN
+        OPEN v_cursor FOR SELECT * FROM SERVICIOS;
+        RETURN v_cursor;
+    END;
+END servicios_pkg;
+
+CREATE OR REPLACE PACKAGE servicios_pkg AS
+    PROCEDURE select_servicios_por_precio(p_precio_servicio IN SERVICIOS.PRECIO_SERVICIO%TYPE);
+    PROCEDURE select_servicios_por_nombre(p_nombre_servicio IN SERVICIOS.NOMBRE_SERVICIO%TYPE);
+    FUNCTION obtener_servicios RETURN SYS_REFCURSOR;
+END servicios_pkg;
+
+
+CREATE OR REPLACE PACKAGE BODY servicios_pkg AS
+    PROCEDURE select_servicios_por_precio(p_precio_servicio IN SERVICIOS.PRECIO_SERVICIO%TYPE) AS
+    BEGIN
+        FOR r IN (SELECT * FROM SERVICIOS WHERE PRECIO_SERVICIO = p_precio_servicio) LOOP
+            DBMS_OUTPUT.PUT_LINE('ID Servicio: ' || r.COD_SERVICIO || ', Nombre: ' || r.NOMBRE_SERVICIO);
+        END LOOP;
+    END;
+
+    PROCEDURE select_servicios_por_nombre(p_nombre_servicio IN SERVICIOS.NOMBRE_SERVICIO%TYPE) AS
+    BEGIN
+        FOR r IN (SELECT * FROM SERVICIOS WHERE NOMBRE_SERVICIO = p_nombre_servicio) LOOP
+            DBMS_OUTPUT.PUT_LINE('ID Servicio: ' || r.COD_SERVICIO || ', Precio: ' || r.PRECIO_SERVICIO);
+        END LOOP;
+    END;
+
+    FUNCTION obtener_servicios RETURN SYS_REFCURSOR IS
+        v_cursor SYS_REFCURSOR;
+    BEGIN
+        OPEN v_cursor FOR SELECT * FROM SERVICIOS;
+        RETURN v_cursor;
+    END;
+END servicios_pkg;
+
+CREATE OR REPLACE PACKAGE empleados_pkg AS
+    PROCEDURE select_empleados_por_cargo(p_cargo_empleado IN EMPLEADOS.CARGO_EMPLEADO%TYPE);
+    FUNCTION obtener_empleados RETURN SYS_REFCURSOR;
+    FUNCTION obtener_empleados_por_cargo(p_cargo_empleado IN VARCHAR2) RETURN SYS_REFCURSOR;
+END empleados_pkg;
+
+
+CREATE OR REPLACE PACKAGE BODY empleados_pkg AS
+    PROCEDURE select_empleados_por_cargo(p_cargo_empleado IN EMPLEADOS.CARGO_EMPLEADO%TYPE) AS
+    BEGIN
+        FOR r IN (SELECT * FROM EMPLEADOS WHERE CARGO_EMPLEADO = p_cargo_empleado) LOOP
+            DBMS_OUTPUT.PUT_LINE('ID Empleado: ' || r.ID_EMPLEADO || ', Nombre: ' || r.NOMBRE_EMPLEADO);
+        END LOOP;
+    END;
+
+    FUNCTION obtener_empleados RETURN SYS_REFCURSOR IS
+        v_cursor SYS_REFCURSOR;
+    BEGIN
+        OPEN v_cursor FOR SELECT * FROM EMPLEADOS;
+        RETURN v_cursor;
+    END;
+
+    FUNCTION obtener_empleados_por_cargo(p_cargo_empleado IN VARCHAR2) RETURN SYS_REFCURSOR IS
+        v_cursor SYS_REFCURSOR;
+    BEGIN
+        OPEN v_cursor FOR SELECT * FROM EMPLEADOS WHERE CARGO_EMPLEADO = p_cargo_empleado;
+        RETURN v_cursor;
+    END;
+END empleados_pkg;
+
+CREATE OR REPLACE PACKAGE clientes_proveedores_pkg AS
+    FUNCTION obtener_clientes RETURN SYS_REFCURSOR;
+    FUNCTION obtener_proveedores RETURN SYS_REFCURSOR;
+    PROCEDURE select_clientes_con_multiples_facturas;
+END clientes_proveedores_pkg;
+
+
+CREATE OR REPLACE PACKAGE BODY clientes_proveedores_pkg AS
+    FUNCTION obtener_clientes RETURN SYS_REFCURSOR IS
+        v_cursor SYS_REFCURSOR;
+    BEGIN
+        OPEN v_cursor FOR SELECT * FROM CONTACTOS WHERE TIPO_CONTACTO = 'Cliente';
+        RETURN v_cursor;
+    END;
+
+    FUNCTION obtener_proveedores RETURN SYS_REFCURSOR IS
+        v_cursor SYS_REFCURSOR;
+    BEGIN
+        OPEN v_cursor FOR SELECT * FROM CONTACTOS WHERE TIPO_CONTACTO = 'Proveedor';
+        RETURN v_cursor;
+    END;
+
+    PROCEDURE select_clientes_con_multiples_facturas AS
+    BEGIN
+        FOR r IN (SELECT c.NOMBRE_CONTACTO, COUNT(f.ID_FACTURA) AS NUM_FACTURAS
+                  FROM CONTACTOS c
+                  JOIN FACTURAS f ON c.ID_CONTACTO = f.COD_CLIENTE
+                  GROUP BY c.NOMBRE_CONTACTO
+                  HAVING COUNT(f.ID_FACTURA) > 1) LOOP
+            DBMS_OUTPUT.PUT_LINE('Cliente: ' || r.NOMBRE_CONTACTO || ', Número de Facturas: ' || r.NUM_FACTURAS);
+        END LOOP;
+    END;
+END clientes_proveedores_pkg;
+
+
+
+
+
+
+
