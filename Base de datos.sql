@@ -2004,7 +2004,7 @@ BEGIN
 END;
 /
 
--- 17. Seleccionar el total de repuestos por vehículo
+-- 17. Seleccionar el total de repuestos por vehï¿½culo
 
 CREATE OR REPLACE PROCEDURE select_total_repuestos_por_vehiculo (
     p_id_vehiculo IN VEHICULOS.ID_VEHICULO%TYPE
@@ -2037,7 +2037,7 @@ BEGIN
 END;
 /
 
--- 19. Seleccionar oficinas con vehículos asignados
+-- 19. Seleccionar oficinas con vehï¿½culos asignados
 
 CREATE OR REPLACE PROCEDURE select_oficinas_con_vehiculos AS
 BEGIN
@@ -2051,7 +2051,7 @@ BEGIN
 END;
 /
 
---20. Seleccionar empleados asignados a una oficina específica
+--20. Seleccionar empleados asignados a una oficina especï¿½fica
 
 CREATE OR REPLACE PROCEDURE select_empleados_por_oficina (
     p_id_oficina IN OFICINAS.ID_OFICINA%TYPE
@@ -2067,7 +2067,7 @@ BEGIN
 END;
 /
 
--- 21. Seleccionar vehículos por oficina
+-- 21. Seleccionar vehï¿½culos por oficina
 
 CREATE OR REPLACE PROCEDURE select_vehiculos_por_oficina (
     p_id_oficina IN OFICINAS.ID_OFICINA%TYPE
@@ -2078,12 +2078,12 @@ BEGIN
         FROM VEHICULOS v
         WHERE v.ID_OFICINA = p_id_oficina
     ) LOOP
-        DBMS_OUTPUT.PUT_LINE('ID Vehículo: ' || r.ID_VEHICULO || ', Placa: ' || r.NUM_PLACA);
+        DBMS_OUTPUT.PUT_LINE('ID Vehï¿½culo: ' || r.ID_VEHICULO || ', Placa: ' || r.NUM_PLACA);
     END LOOP;
 END;
 /
 
--- 22. Seleccionar servicios realizados por un empleado específico
+-- 22. Seleccionar servicios realizados por un empleado especï¿½fico
 
 CREATE OR REPLACE PROCEDURE select_servicios_por_empleado (
     p_id_empleado IN EMPLEADOS.ID_EMPLEADO%TYPE
@@ -2099,7 +2099,7 @@ BEGIN
 END;
 /
 
--- 23. Seleccionar repuestos utilizados en una factura específica
+-- 23. Seleccionar repuestos utilizados en una factura especï¿½fica
 
 CREATE OR REPLACE PROCEDURE select_repuestos_por_factura (
     p_cod_factura IN DETALLE_FACTURA.COD_FACTURA%TYPE
@@ -2133,7 +2133,7 @@ BEGIN
 END;
 /
 
--- 25. Seleccionar oficinas sin vehículos asignados
+-- 25. Seleccionar oficinas sin vehï¿½culos asignados
 
 CREATE OR REPLACE PROCEDURE select_oficinas_sin_vehiculos AS
 BEGIN
