@@ -1988,6 +1988,165 @@ BEGIN
     END LOOP;
 END;
 / 
+--16. Seleccionar el total de facturas por cliente
+
+CREATE OR REPLACE PROCEDURE select_total_facturas_por_cliente (
+    p_cod_cliente IN FACTURAS.COD_CLIENTE%TYPE
+) AS
+    v_total_facturas NUMBER;
+BEGIN
+    SELECT COUNT(*)
+    INTO v_total_facturas
+    FROM FACTURAS
+    WHERE COD_CLIENTE = p_cod_cliente;
+    
+    DBMS_OUTPUT.PUT_LINE('Total de facturas: ' || v_total_facturas);
+END;
+/
+
+-- 17. Seleccionar el total de repuestos por vehículo
+
+CREATE OR REPLACE PROCEDURE select_total_repuestos_por_vehiculo (
+    p_id_vehiculo IN VEHICULOS.ID_VEHICULO%TYPE
+) AS
+    v_total_repuestos NUMBER;
+BEGIN
+    SELECT COUNT(*)
+    INTO v_total_repuestos
+    FROM DETALLE_FACTURA df
+    JOIN VEHICULOS v ON df.ID_VEHICULO = v.ID_VEHICULO
+    WHERE v.ID_VEHICULO = p_id_vehiculo;
+    
+    DBMS_OUTPUT.PUT_LINE('Total de repuestos: ' || v_total_repuestos);
+END;
+/
+
+-- 18. Seleccionar el monto total facturado por cliente
+
+CREATE OR REPLACE PROCEDURE select_total_facturado_por_cliente (
+    p_cod_cliente IN FACTURAS.COD_CLIENTE%TYPE
+) AS
+    v_total_facturado NUMBER;
+BEGIN
+    SELECT SUM(TOTAL_FACTURA)
+    INTO v_total_facturado
+    FROM FACTURAS
+    WHERE COD_CLIENTE = p_cod_cliente;
+    
+    DBMS_OUTPUT.PUT_LINE('Total facturado: ' || v_total_facturado);
+END;
+/
+
+-- 19. Seleccionar oficinas con vehículos asignados
+
+CREATE OR REPLACE PROCEDURE select_oficinas_con_vehiculos AS
+BEGIN
+    FOR r IN (
+        SELECT DISTINCT o.ID_OFICINA, o.NOMBRE_OFICINA
+        FROM OFICINAS o
+        JOIN VEHICULOS v ON o.ID_OFICINA = v.ID_OFICINA
+    ) LOOP
+        DBMS_OUTPUT.PUT_LINE('ID Oficina: ' || r.ID_OFICINA || ', Nombre: ' || r.NOMBRE_OFICINA);
+    END LOOP;
+END;
+/
+
+--20. Seleccionar empleados asignados a una oficina específica
+
+CREATE OR REPLACE PROCEDURE select_empleados_por_oficina (
+    p_id_oficina IN OFICINAS.ID_OFICINA%TYPE
+) AS
+BEGIN
+    FOR r IN (
+        SELECT e.ID_EMPLEADO, e.NOMBRE_EMPLEADO
+        FROM EMPLEADOS e
+        WHERE e.ID_OFICINA = p_id_oficina
+    ) LOOP
+        DBMS_OUTPUT.PUT_LINE('ID Empleado: ' || r.ID_EMPLEADO || ', Nombre: ' || r.NOMBRE_EMPLEADO);
+    END LOOP;
+END;
+/
+
+-- 21. Seleccionar vehículos por oficina
+
+CREATE OR REPLACE PROCEDURE select_vehiculos_por_oficina (
+    p_id_oficina IN OFICINAS.ID_OFICINA%TYPE
+) AS
+BEGIN
+    FOR r IN (
+        SELECT v.ID_VEHICULO, v.NUM_PLACA
+        FROM VEHICULOS v
+        WHERE v.ID_OFICINA = p_id_oficina
+    ) LOOP
+        DBMS_OUTPUT.PUT_LINE('ID Vehículo: ' || r.ID_VEHICULO || ', Placa: ' || r.NUM_PLACA);
+    END LOOP;
+END;
+/
+
+-- 22. Seleccionar servicios realizados por un empleado específico
+
+CREATE OR REPLACE PROCEDURE select_servicios_por_empleado (
+    p_id_empleado IN EMPLEADOS.ID_EMPLEADO%TYPE
+) AS
+BEGIN
+    FOR r IN (
+        SELECT s.ID_SERVICIO, s.NOMBRE_SERVICIO
+        FROM SERVICIOS s
+        WHERE s.ID_EMPLEADO = p_id_empleado
+    ) LOOP
+        DBMS_OUTPUT.PUT_LINE('ID Servicio: ' || r.ID_SERVICIO || ', Nombre: ' || r.NOMBRE_SERVICIO);
+    END LOOP;
+END;
+/
+
+-- 23. Seleccionar repuestos utilizados en una factura específica
+
+CREATE OR REPLACE PROCEDURE select_repuestos_por_factura (
+    p_cod_factura IN DETALLE_FACTURA.COD_FACTURA%TYPE
+) AS
+BEGIN
+    FOR r IN (
+        SELECT r.ID_REPUESTO, r.NOMBRE_REPUESTO
+        FROM REPUESTOS r
+        JOIN DETALLE_FACTURA df ON r.ID_REPUESTO = df.ID_REPUESTO
+        WHERE df.COD_FACTURA = p_cod_factura
+    ) LOOP
+        DBMS_OUTPUT.PUT_LINE('ID Repuesto: ' || r.ID_REPUESTO || ', Nombre: ' || r.NOMBRE_REPUESTO);
+    END LOOP;
+END;
+/
+
+-- 24. Seleccionar facturas dentro de un rango de fechas
+
+CREATE OR REPLACE PROCEDURE select_facturas_por_rango_fecha (
+    p_fecha_inicio IN FACTURAS.FECHA_FACTURA%TYPE,
+    p_fecha_fin IN FACTURAS.FECHA_FACTURA%TYPE
+) AS
+BEGIN
+    FOR r IN (
+        SELECT *
+        FROM FACTURAS
+        WHERE FECHA_FACTURA BETWEEN p_fecha_inicio AND p_fecha_fin
+    ) LOOP
+        DBMS_OUTPUT.PUT_LINE('ID Factura: ' || r.ID_FACTURA || ', Fecha: ' || r.FECHA_FACTURA || ', Total: ' || r.TOTAL_FACTURA);
+    END LOOP;
+END;
+/
+
+-- 25. Seleccionar oficinas sin vehículos asignados
+
+CREATE OR REPLACE PROCEDURE select_oficinas_sin_vehiculos AS
+BEGIN
+    FOR r IN (
+        SELECT o.ID_OFICINA, o.NOMBRE_OFICINA
+        FROM OFICINAS o
+        LEFT JOIN VEHICULOS v ON o.ID_OFICINA = v.ID_OFICINA
+        WHERE v.ID_OFICINA IS NULL
+    ) LOOP
+        DBMS_OUTPUT.PUT_LINE('ID Oficina: ' || r.ID_OFICINA || ', Nombre: ' || r.NOMBRE_OFICINA);
+    END LOOP;
+END;
+/
 
 /*
 **********************************************************************
