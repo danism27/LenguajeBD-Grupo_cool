@@ -298,6 +298,8 @@ INSERT INTO EMPLEADOS (NOMBRE_EMPLEADO, APELLIDO_EMPLEADO, CARGO_EMPLEADO, FECHA
 VALUES ('Luis', 'Rodriguez', 'Supervisor', TO_DATE('2023-05-30', 'YYYY-MM-DD'), 4500.00);
 
 
+
+
 /*
 **********************************************************************
 *                                                                    *
@@ -327,7 +329,7 @@ BEGIN
     insert_contacto(
         p_tipo_contacto => 'Proveedor',
         p_cod_contacto => '207',
-        p_nombre_contacto => 'Ana García',
+        p_nombre_contacto => 'Ana Garc a',
         p_direccion_contacto => 'Avenida Siempre Viva 742',
         p_telefono_contacto => '987654321',
         p_email_contacto => 'ana.garcia@example.com'
@@ -358,7 +360,7 @@ DECLARE
     v_email_contacto CONTACTOS.EMAIL_CONTACTO%TYPE;
 BEGIN
     get_contacto(
-        p_cod_contacto => '206',
+        p_cod_contacto => '207',
         p_tipo_contacto => v_tipo_contacto,
         p_nombre_contacto => v_nombre_contacto,
         p_direccion_contacto => v_direccion_contacto,
@@ -367,8 +369,8 @@ BEGIN
     );
     DBMS_OUTPUT.PUT_LINE('Tipo de Contacto: ' || v_tipo_contacto);
     DBMS_OUTPUT.PUT_LINE('Nombre de Contacto: ' || v_nombre_contacto);
-    DBMS_OUTPUT.PUT_LINE('Dirección de Contacto: ' || v_direccion_contacto);
-    DBMS_OUTPUT.PUT_LINE('Teléfono de Contacto: ' || v_telefono_contacto);
+    DBMS_OUTPUT.PUT_LINE('Direcci n de Contacto: ' || v_direccion_contacto);
+    DBMS_OUTPUT.PUT_LINE('Tel fono de Contacto: ' || v_telefono_contacto);
     DBMS_OUTPUT.PUT_LINE('Email de Contacto: ' || v_email_contacto);
 END;
 ----------------------    ACTUALIZAR   -----------------------------------------
@@ -395,9 +397,9 @@ END;
 
 BEGIN
     update_contacto(
-        p_cod_contacto => 206,  -- Reemplaza con el COD_CONTACTO existente
-        p_tipo_contacto => 'Proveedor',
-        p_nombre_contacto => 'Ana García Actualizada',
+        p_cod_contacto => 207,  -- Reemplaza con el COD_CONTACTO existente
+        p_tipo_contacto => 'Cama',
+        p_nombre_contacto => 'Ana Garc a Actualizada',
         p_direccion_contacto => 'Avenida Siempre Viva 742 Actualizada',
         p_telefono_contacto => '987654321',
         p_email_contacto => 'ana.garcia.actualizada@example.com'
@@ -446,7 +448,7 @@ END;
 BEGIN
     insert_factura(
         p_cod_factura => 1006,
-        p_cod_cliente => 22,  -- Asegúrate de que este COD_CLIENTE existe en CONTACTOS
+        p_cod_cliente => 2,  -- Aseg rate de que este COD_CLIENTE existe en CONTACTOS
         p_fecha_factura => DATE '2024-07-23',
         p_total_factura => 1500.50
     );
@@ -482,7 +484,7 @@ DECLARE
     v_telefono_contacto CONTACTOS.TELEFONO_CONTACTO%TYPE;
 BEGIN
     get_factura(
-        p_id_factura => 21,  -- Reemplaza con un ID_FACTURA existente
+        p_id_factura => 2,  -- Reemplaza con un ID_FACTURA existente
         p_cod_factura => v_cod_factura,
         p_cod_cliente => v_cod_cliente,
         p_fecha_factura => v_fecha_factura,
@@ -490,12 +492,12 @@ BEGIN
         p_nombre_contacto => v_nombre_contacto,
         p_telefono_contacto => v_telefono_contacto
     );
-    DBMS_OUTPUT.PUT_LINE('Código de Factura: ' || v_cod_factura);
-    DBMS_OUTPUT.PUT_LINE('Código de Cliente: ' || v_cod_cliente);
+    DBMS_OUTPUT.PUT_LINE('C digo de Factura: ' || v_cod_factura);
+    DBMS_OUTPUT.PUT_LINE('C digo de Cliente: ' || v_cod_cliente);
     DBMS_OUTPUT.PUT_LINE('Fecha de Factura: ' || v_fecha_factura);
     DBMS_OUTPUT.PUT_LINE('Total de Factura: ' || v_total_factura);
     DBMS_OUTPUT.PUT_LINE('Nombre de Contacto: ' || v_nombre_contacto);
-    DBMS_OUTPUT.PUT_LINE('Teléfono de Contacto: ' || v_telefono_contacto);
+    DBMS_OUTPUT.PUT_LINE('Tel fono de Contacto: ' || v_telefono_contacto);
 END;
 ------------------------    ACTUALIZAR   ---------------------------------------
 CREATE OR REPLACE PROCEDURE update_factura (
@@ -520,9 +522,9 @@ END;
 
 BEGIN
     update_factura(
-        p_id_factura =>21,  -- ID de la factura a actualizar
+        p_id_factura =>2,  -- ID de la factura a actualizar
         p_cod_factura => '2022',
-        p_cod_cliente => 24,  -- Asegúrate de que este COD_CLIENTE existe en CONTACTOS
+        p_cod_cliente => 2,  -- Aseg rate de que este COD_CLIENTE existe en CONTACTOS
         p_fecha_factura => DATE '2024-07-23',
         p_total_factura => 32000
     );
@@ -543,10 +545,10 @@ END;
 
 BEGIN
     delete_factura(
-        p_id_factura => 21 
+        p_id_factura => 2
     );
 END;
---------------------------    FACTURAS   ---------------------------------------
+--------------------------   REPUESTOS   ---------------------------------------
 SELECT * FROM REPUESTOS;
 ------------------------    CREAR   --------------------------------------------
 
@@ -593,7 +595,7 @@ END;
 -- Usar procedure
 
 DECLARE
-    v_id_repuesto REPUESTOS.ID_REPUESTO%TYPE := 22; 
+    v_id_repuesto REPUESTOS.ID_REPUESTO%TYPE := 1; 
     v_cod_repuesto REPUESTOS.COD_REPUESTO%TYPE;
     v_nombre_repuesto REPUESTOS.NOMBRE_REPUESTO%TYPE;
     v_fecha_registro REPUESTOS.FECHA_REGISTRO%TYPE;
@@ -637,7 +639,7 @@ END;
 
 BEGIN
     update_repuesto(
-        p_id_repuesto => 22,  
+        p_id_repuesto => 1,  
         p_cod_repuesto => '333',
         p_nombre_repuesto => 'Filtro de Aire Modificado',
         p_fecha_registro => DATE '2024-07-24',
@@ -668,22 +670,24 @@ SELECT * FROM DETALLE_FACTURA;
 CREATE OR REPLACE PROCEDURE insert_detalle_factura(
     p_cod_factura IN DETALLE_FACTURA.COD_FACTURA%TYPE,
     p_cod_repuesto IN DETALLE_FACTURA.COD_REPUESTO%TYPE,
-    p_cantidad IN DETALLE_FACTURA.CANTIDAD%TYPE
+    p_cantidad IN DETALLE_FACTURA.CANTIDAD%TYPE,
+    p_precio IN DETALLE_FACTURA.PRECIO_UNITARIO%TYPE
 ) AS
 BEGIN
-    INSERT INTO DETALLE_FACTURA (COD_FACTURA, COD_REPUESTO, CANTIDAD)
-    VALUES (p_cod_factura, p_cod_repuesto, p_cantidad);
-    
+    INSERT INTO DETALLE_FACTURA (COD_FACTURA, COD_REPUESTO, CANTIDAD, PRECIO_UNITARIO)
+    VALUES (p_cod_factura, p_cod_repuesto, p_cantidad,p_precio);
     DBMS_OUTPUT.PUT_LINE('Detalle de factura insertado correctamente');
 END;
-
+INSERT INTO DETALLE_FACTURA (COD_FACTURA, COD_REPUESTO, CANTIDAD, PRECIO_UNITARIO)
+VALUES (2, 1, 4,200);
 -- Usar procedure
 
 BEGIN
     insert_detalle_factura(
-        p_cod_factura =>41,   --
-        p_cod_repuesto => 23,  --
-        p_cantidad => 10
+        p_cod_factura =>2,   
+        p_cod_repuesto =>1,  
+        p_cantidad => 10,
+        p_precio => 200
     );
 END;
 
@@ -711,13 +715,13 @@ DECLARE
     v_cantidad DETALLE_FACTURA.CANTIDAD%TYPE;
 BEGIN
     get_detalle_factura(
-        p_id_detalle_factura => 25,  -- Reemplaza con un ID_DETALLE_FACTURA existente
+        p_id_detalle_factura => 6,  -- Reemplaza con un ID_DETALLE_FACTURA existente
         p_cod_factura => v_cod_factura,
         p_cod_repuesto => v_cod_repuesto,
         p_cantidad => v_cantidad
     );
-    DBMS_OUTPUT.PUT_LINE('Código de Factura: ' || v_cod_factura);
-    DBMS_OUTPUT.PUT_LINE('Código de Repuesto: ' || v_cod_repuesto);
+    DBMS_OUTPUT.PUT_LINE('C digo de Factura: ' || v_cod_factura);
+    DBMS_OUTPUT.PUT_LINE('C digo de Repuesto: ' || v_cod_repuesto);
     DBMS_OUTPUT.PUT_LINE('Cantidad: ' || v_cantidad);
 END;
 ------------------------    ACTUALIZAR   ---------------------------------------
@@ -742,7 +746,7 @@ END;
 BEGIN
     update_detalle_factura(
         p_id_detalle_factura => 5,  -- 
-        p_cod_factura => 1,      --
+        p_cod_factura => 2,      --
         p_cod_repuesto => 1,     -- 
         p_cantidad => 32
     );
@@ -763,7 +767,7 @@ END;
 
 BEGIN
     delete_detalle_factura(
-        p_id_detalle_factura => 2  -- Reemplaza con un ID_DETALLE_FACTURA existente
+        p_id_detalle_factura => 6  -- Reemplaza con un ID_DETALLE_FACTURA existente
     );
 END;
 
@@ -883,7 +887,7 @@ BEGIN
     INSERT INTO VEHICULOS (NUM_PLACA, TIPO_VEHICULO, ESTADO_VEHICULO, MARCA, MODELO, FECHA_REGISTRO, NOMBRE_USUARIO)
     VALUES (p_num_placa, p_tipo_vehiculo, p_estado_vehiculo, p_marca, p_modelo, p_fecha_registro, p_nombre_usuario);
     
-    DBMS_OUTPUT.PUT_LINE('Vehículo insertado correctamente');
+    DBMS_OUTPUT.PUT_LINE('Veh culo insertado correctamente');
 END;
 -- Usar procedure
 BEGIN
@@ -894,7 +898,7 @@ BEGIN
         p_marca => 'Toyota',
         p_modelo => 'RAV4',
         p_fecha_registro => DATE '2024-07-23',
-        p_nombre_usuario => 'Juan Pérez'
+        p_nombre_usuario => 'Juan P rez'
     );
 END;
 /
@@ -917,7 +921,7 @@ BEGIN
     FROM VEHICULOS
     WHERE ID_VEHICULO = p_id_vehiculo;
 
-    DBMS_OUTPUT.PUT_LINE('Vehículo encontrado correctamente');
+    DBMS_OUTPUT.PUT_LINE('Veh culo encontrado correctamente');
 END;
 
 
@@ -942,9 +946,9 @@ BEGIN
         p_fecha_registro => v_fecha_registro,
         p_nombre_usuario => v_nombre_usuario
     );
-    DBMS_OUTPUT.PUT_LINE('Número de Placa: ' || v_num_placa);
-    DBMS_OUTPUT.PUT_LINE('Tipo de Vehículo: ' || v_tipo_vehiculo);
-    DBMS_OUTPUT.PUT_LINE('Estado del Vehículo: ' || v_estado_vehiculo);
+    DBMS_OUTPUT.PUT_LINE('N mero de Placa: ' || v_num_placa);
+    DBMS_OUTPUT.PUT_LINE('Tipo de Veh culo: ' || v_tipo_vehiculo);
+    DBMS_OUTPUT.PUT_LINE('Estado del Veh culo: ' || v_estado_vehiculo);
     DBMS_OUTPUT.PUT_LINE('Marca: ' || v_marca);
     DBMS_OUTPUT.PUT_LINE('Modelo: ' || v_modelo);
     DBMS_OUTPUT.PUT_LINE('Fecha de Registro: ' || v_fecha_registro);
@@ -973,7 +977,7 @@ BEGIN
         NOMBRE_USUARIO = p_nombre_usuario
     WHERE ID_VEHICULO = p_id_vehiculo;
     
-    DBMS_OUTPUT.PUT_LINE('Vehículo actualizado correctamente');
+    DBMS_OUTPUT.PUT_LINE('Veh culo actualizado correctamente');
 END;
 
 -- Usar procedure
@@ -981,29 +985,17 @@ END;
 BEGIN
     update_vehiculo(
         p_id_vehiculo => 1,  -- Reemplaza con un ID_VEHICULO existente
-        p_num_placa => 'XYZ789',
-        p_tipo_vehiculo => 'Sedán',
+        p_num_placa => 'XYZ78911',
+        p_tipo_vehiculo => 'Sed n',
         p_estado_vehiculo => 'Usado',
         p_marca => 'Honda',
         p_modelo => 'Civic',
         p_fecha_registro => DATE '2024-07-24',
-        p_nombre_usuario => 'Ana García'
+        p_nombre_usuario => 'Ana Garc a'
     );
 END;
 
 
-BEGIN
-    update_vehiculo(
-        p_id_vehiculo => 1,  -- Reemplaza con un ID_VEHICULO existente
-        p_num_placa => 'XYZ789',
-        p_tipo_vehiculo => 'Sedán',
-        p_estado_vehiculo => 'Usado',
-        p_marca => 'Honda',
-        p_modelo => 'Civic',
-        p_fecha_registro => DATE '2024-07-24',
-        p_nombre_usuario => 'Ana García'
-    );
-END;
 
 ------------------------    ELIMINAR   -----------------------------------------
 CREATE OR REPLACE PROCEDURE delete_vehiculo (
@@ -1013,14 +1005,14 @@ BEGIN
     DELETE FROM VEHICULOS
     WHERE ID_VEHICULO = p_id_vehiculo;
     
-    DBMS_OUTPUT.PUT_LINE('Vehículo eliminado correctamente');
+    DBMS_OUTPUT.PUT_LINE('Veh culo eliminado correctamente');
 END;
 
 -- Usar procedure
 
 BEGIN
     delete_vehiculo(
-        p_id_vehiculo => 1  
+        p_id_vehiculo => 1  );
 END;
 
 --------------------------    SERVICIOS   ---------------------------------------
@@ -1087,9 +1079,9 @@ BEGIN
         p_descripcion_servicio => v_descripcion_servicio,
         p_precio_servicio => v_precio_servicio
     );
-    DBMS_OUTPUT.PUT_LINE('Código de Servicio: ' || v_cod_servicio);
+    DBMS_OUTPUT.PUT_LINE('C digo de Servicio: ' || v_cod_servicio);
     DBMS_OUTPUT.PUT_LINE('Nombre de Servicio: ' || v_nombre_servicio);
-    DBMS_OUTPUT.PUT_LINE('Descripción de Servicio: ' || v_descripcion_servicio);
+    DBMS_OUTPUT.PUT_LINE('Descripci n de Servicio: ' || v_descripcion_servicio);
     DBMS_OUTPUT.PUT_LINE('Precio de Servicio: ' || v_precio_servicio);
 END;
 
@@ -1122,7 +1114,7 @@ BEGIN
         p_id_servicio => 5,  -- Reemplaza con un ID_SERVICIO existente
         p_cod_servicio => 1002,
         p_nombre_servicio => 'Cambio de Aceite',
-        p_descripcion_servicio => 'Cambio de aceite para todo tipo de vehículos',
+        p_descripcion_servicio => 'Cambio de aceite para todo tipo de veh culos',
         p_precio_servicio => 50.00
     );
 END;
@@ -1171,7 +1163,7 @@ END;
 BEGIN
     insert_empleado(
         p_nombre_empleado => 'Carlos',
-        p_apellido_empleado => 'Gómez',
+        p_apellido_empleado => 'G mez',
         p_cargo_empleado => 'Gerente',
         p_fecha_contratacion => DATE '2024-07-23',
         p_salario => 5000.00
@@ -1185,6 +1177,7 @@ END;
 
 ------------------------    LEER   ---------------------------------------------
 CREATE OR REPLACE PROCEDURE get_empleado (
+
     p_id_empleado IN EMPLEADOS.ID_EMPLEADO%TYPE,
     p_nombre_empleado OUT EMPLEADOS.NOMBRE_EMPLEADO%TYPE,
     p_apellido_empleado OUT EMPLEADOS.APELLIDO_EMPLEADO%TYPE,
@@ -1223,7 +1216,7 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE('Nombre del Empleado: ' || v_nombre_empleado);
     DBMS_OUTPUT.PUT_LINE('Apellido del Empleado: ' || v_apellido_empleado);
     DBMS_OUTPUT.PUT_LINE('Cargo del Empleado: ' || v_cargo_empleado);
-    DBMS_OUTPUT.PUT_LINE('Fecha de Contratación: ' || v_fecha_contratacion);
+    DBMS_OUTPUT.PUT_LINE('Fecha de Contrataci n: ' || v_fecha_contratacion);
     DBMS_OUTPUT.PUT_LINE('Salario: ' || v_salario);
 END;
 
@@ -1256,7 +1249,7 @@ END;
 
 BEGIN
     update_empleado(
-        p_id_empleado => 5,  -- Reemplaza con un ID_EMPLEADO existente
+        p_id_empleado => 1,  -- Reemplaza con un ID_EMPLEADO existente
         p_nombre_empleado => 'Sebastian',
         p_apellido_empleado => 'Hernandez',
         p_cargo_empleado => 'Jimenez',
@@ -1284,7 +1277,7 @@ END;
 BEGIN
 
     delete_empleado(
-        p_id_empleado => 21  -- Reemplaza con un ID_EMPLEADO existente
+        p_id_empleado => 1  -- Reemplaza con un ID_EMPLEADO existente
     );
 END;
 
