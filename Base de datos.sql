@@ -1293,528 +1293,355 @@ END;
 
 --------------------------Dani----------------------------------------
 
--- Habilitar la salida de DBMS_OUTPUT para la funciï¿½n
+-- Habilitar la salida de DBMS_OUTPUT para las funciones
 SET SERVEROUTPUT ON;
 
--- Funciï¿½n 1: Calcular el total de una factura
-CREATE OR REPLACE FUNCTION calcular_total_factura(p_id_factura IN INTEGER)
-RETURN NUMBER IS
-    v_total NUMBER(10, 2);
+--------------------------------------------------------------------------------
+-- Función 1: Obtener el nombre completo de un contacto por su ID
+CREATE OR REPLACE FUNCTION obtener_nombre_contacto (p_id_contacto INTEGER) RETURN VARCHAR2 IS
+    v_nombre_contacto VARCHAR2(100);
 BEGIN
-    SELECT SUM(rp.PRECIO_REPUESTO * df.CANTIDAD)
-    INTO v_total
-    FROM DETALLE_FACTURA df
-    JOIN REPUESTOS rp ON df.COD_REPUESTO = rp.ID_REPUESTO
-    WHERE df.COD_FACTURA = p_id_factura;
-    
-    DBMS_OUTPUT.PUT_LINE('El total de la factura ' || p_id_factura || ' es: ' || v_total);
-    
-    RETURN v_total;
-EXCEPTION
-    WHEN NO_DATA_FOUND THEN
-        DBMS_OUTPUT.PUT_LINE('No se encontraron datos para la factura ' || p_id_factura);
-        RETURN 0;
-    WHEN OTHERS THEN
-        DBMS_OUTPUT.PUT_LINE('Ocurriï¿½ un error al calcular el total de la factura ' || p_id_factura);
-        RETURN -1;
-END;
-/
-
--- Llamada a la funciï¿½n calcular_total_factura
-DECLARE
-    v_total NUMBER;
-BEGIN
-    v_total := calcular_total_factura(2); -- Cambiar el ID de la factura segï¿½n sea necesario
-    DBMS_OUTPUT.PUT_LINE('Resultado de la funciï¿½n calcular_total_factura: ' || v_total);
-END;
-/
-
--- Habilitar la salida de DBMS_OUTPUT para la funciï¿½n
-SET SERVEROUTPUT ON;
-
--- Funciï¿½n 2: Calcular el total de todas las facturas
-CREATE OR REPLACE FUNCTION calcular_total_facturas
-RETURN NUMBER IS
-    v_total NUMBER(10, 2);
-BEGIN
-    SELECT SUM(TOTAL_FACTURA)
-    INTO v_total
-    FROM FACTURAS;
-
-    RETURN v_total;
-EXCEPTION
-    WHEN NO_DATA_FOUND THEN
-        RETURN 0;
-    WHEN OTHERS THEN
-        RETURN -1;
-END;
-/
-
--- Llamada a la funciï¿½n calcular_total_facturas
-DECLARE
-    v_total NUMBER;
-BEGIN
-    v_total := calcular_total_facturas();
-    DBMS_OUTPUT.PUT_LINE('Resultado de la funciï¿½n calcular_total_facturas: ' || v_total);
-END;
-/
-
--- Habilitar la salida de DBMS_OUTPUT para la funciï¿½n
-SET SERVEROUTPUT ON;
-
--- Funciï¿½n 3: Obtener el total de los servicios de una oficina
-CREATE OR REPLACE FUNCTION total_servicios_oficina(p_id_oficina IN INTEGER)
-RETURN NUMBER IS
-    v_total NUMBER(10, 2);
-BEGIN
-    SELECT NVL(SUM(s.PRECIO_SERVICIO), 0)
-    INTO v_total
-    FROM SERVICIOS s
-    JOIN EMPLEADOS e ON s.COD_SERVICIO = e.ID_EMPLEADO
-    WHERE e.ID_OFICINA = p_id_oficina;
-
-    RETURN v_total;
-EXCEPTION
-    WHEN NO_DATA_FOUND THEN
-        RETURN 0;
-    WHEN OTHERS THEN
-        RETURN -1;
-END;
-/
-
--- Llamada a la funciï¿½n total_servicios_oficina
-DECLARE
-    v_total NUMBER;
-BEGIN
-    v_total := total_servicios_oficina(1); -- Cambiar el ID de la oficina segï¿½n sea necesario
-    DBMS_OUTPUT.PUT_LINE('Resultado de la funciï¿½n total_servicios_oficina: ' || v_total);
-END;
-/
-
--- Habilitar la salida de DBMS_OUTPUT para la funciï¿½n
-SET SERVEROUTPUT ON;
-
--- Funciï¿½n 4: Obtener los detalles de una factura especï¿½fica
-CREATE OR REPLACE FUNCTION obtener_detalle_factura(p_id_factura IN INTEGER)
-RETURN SYS_REFCURSOR IS
-    v_cursor SYS_REFCURSOR;
-BEGIN
-    OPEN v_cursor FOR
-        SELECT df.COD_REPUESTO, r.NOMBRE_REPUESTO, df.CANTIDAD, r.PRECIO_REPUESTO
-        FROM DETALLE_FACTURA df
-        JOIN REPUESTOS r ON df.COD_REPUESTO = r.ID_REPUESTO
-        WHERE df.COD_FACTURA = p_id_factura;
-
-    RETURN v_cursor;
-EXCEPTION
-    WHEN OTHERS THEN
-        DBMS_OUTPUT.PUT_LINE('Error: ' || SQLERRM);
-        RETURN NULL;
-END;
-/
-
--- Llamada a la funciï¿½n obtener_detalle_factura
-DECLARE
-    v_cursor SYS_REFCURSOR;
-    v_cod_repuesto REPUESTOS.COD_REPUESTO%TYPE;
-    v_nombre_repuesto REPUESTOS.NOMBRE_REPUESTO%TYPE;
-    v_cantidad DETALLE_FACTURA.CANTIDAD%TYPE;
-    v_precio_repuesto REPUESTOS.PRECIO_REPUESTO%TYPE;
-BEGIN
-    v_cursor := obtener_detalle_factura(1); -- Cambiar el ID de la factura segï¿½n sea necesario
-    
-    LOOP
-        FETCH v_cursor INTO v_cod_repuesto, v_nombre_repuesto, v_cantidad, v_precio_repuesto;
-        EXIT WHEN v_cursor%NOTFOUND;
-        
-        DBMS_OUTPUT.PUT_LINE('Cï¿½digo Repuesto: ' || v_cod_repuesto || ', Nombre: ' || v_nombre_repuesto || 
-                             ', Cantidad: ' || v_cantidad || ', Precio: ' || v_precio_repuesto);
-    END LOOP;
-    
-    CLOSE v_cursor;
-END;
-/
-
--- Habilitar la salida de DBMS_OUTPUT para la funciï¿½n
-SET SERVEROUTPUT ON;
-
--- Funciï¿½n 5: Obtener el contacto con mï¿½s facturas
-CREATE OR REPLACE FUNCTION obtener_contacto_mas_facturas
-RETURN VARCHAR2 IS
-    v_nombre_contacto CONTACTOS.NOMBRE_CONTACTO%TYPE;
-BEGIN
-    SELECT c.NOMBRE_CONTACTO
-    INTO v_nombre_contacto
-    FROM CONTACTOS c
-    JOIN FACTURAS f ON c.ID_CONTACTO = f.COD_CLIENTE
-    GROUP BY c.NOMBRE_CONTACTO
-    ORDER BY COUNT(f.ID_FACTURA) DESC
-    FETCH FIRST ROW ONLY;
-
+    SELECT NOMBRE_CONTACTO INTO v_nombre_contacto 
+    FROM CONTACTOS 
+    WHERE ID_CONTACTO = p_id_contacto;
     RETURN v_nombre_contacto;
 EXCEPTION
     WHEN NO_DATA_FOUND THEN
-        RETURN 'No se encontraron contactos.';
-    WHEN OTHERS THEN
-        RETURN 'Ocurriï¿½ un error al obtener el contacto.';
+        RETURN 'Contacto no encontrado';
+END obtener_nombre_contacto;
+/
+-- Llamada a la función 1
+BEGIN
+    DBMS_OUTPUT.PUT_LINE('Nombre del contacto: ' || obtener_nombre_contacto(1));
 END;
 /
-
--- Llamada a la funciï¿½n obtener_contacto_mas_facturas
-DECLARE
-    v_contacto VARCHAR2(100);
+--------------------------------------------------------------------------------
+-- Función 2: Calcular el total de una factura por ID_FACTURA
+CREATE OR REPLACE FUNCTION calcular_total_factura (p_id_factura INTEGER) RETURN NUMBER IS
+    v_total NUMBER(10,2);
 BEGIN
-    v_contacto := obtener_contacto_mas_facturas();
-    DBMS_OUTPUT.PUT_LINE('Contacto con mï¿½s facturas: ' || v_contacto);
-END;
-/
-
--- Habilitar la salida de DBMS_OUTPUT para la funciï¿½n
-SET SERVEROUTPUT ON;
-
--- Funciï¿½n 6: Calcular el total de ventas de un repuesto
-CREATE OR REPLACE FUNCTION total_ventas_repuesto(p_cod_repuesto IN INTEGER)
-RETURN NUMBER IS
-    v_total_ventas NUMBER(10, 2);
-BEGIN
-    SELECT SUM(df.CANTIDAD * r.PRECIO_REPUESTO)
-    INTO v_total_ventas
-    FROM DETALLE_FACTURA df
-    JOIN REPUESTOS r ON df.COD_REPUESTO = r.ID_REPUESTO
-    WHERE df.COD_REPUESTO = p_cod_repuesto;
-
-    RETURN v_total_ventas;
-EXCEPTION
-    WHEN NO_DATA_FOUND THEN
-        RETURN 0;
-    WHEN OTHERS THEN
-        RETURN -1;
-END;
-/
-
--- Llamada a la funciï¿½n total_ventas_repuesto
-DECLARE
-    v_total_ventas NUMBER;
-BEGIN
-    v_total_ventas := total_ventas_repuesto(301); -- Cambiar el cï¿½digo del repuesto segï¿½n sea necesario
-    DBMS_OUTPUT.PUT_LINE('Total de ventas del repuesto: ' || v_total_ventas);
-END;
-/
-
--- Habilitar la salida de DBMS_OUTPUT para la funciï¿½n
-SET SERVEROUTPUT ON;
-
--- Funciï¿½n 7: Contar vehï¿½culos activos
-CREATE OR REPLACE FUNCTION contar_vehiculos_activos
-RETURN INTEGER IS
-    v_num_vehiculos INTEGER;
-BEGIN
-    SELECT COUNT(*)
-    INTO v_num_vehiculos
-    FROM VEHICULOS
-    WHERE ESTADO_VEHICULO = 'Activo';
-
-    RETURN v_num_vehiculos;
-EXCEPTION
-    WHEN OTHERS THEN
-        RETURN -1;
-END;
-/
-
--- Llamada a la funciï¿½n contar_vehiculos_activos
-DECLARE
-    v_num_vehiculos INTEGER;
-BEGIN
-    v_num_vehiculos := contar_vehiculos_activos();
-    DBMS_OUTPUT.PUT_LINE('Nï¿½mero de vehï¿½culos activos: ' || v_num_vehiculos);
-END;
-/
-
--- Habilitar la salida de DBMS_OUTPUT para la funciï¿½n
-SET SERVEROUTPUT ON;
-
--- Funciï¿½n 8: Obtener precio promedio de servicios
-CREATE OR REPLACE FUNCTION obtener_precio_promedio_servicios
-RETURN NUMBER IS
-    v_precio_promedio NUMBER(10, 2);
-BEGIN
-    SELECT AVG(PRECIO_SERVICIO)
-    INTO v_precio_promedio
-    FROM SERVICIOS;
-
-    RETURN v_precio_promedio;
-EXCEPTION
-    WHEN NO_DATA_FOUND THEN
-        RETURN 0;
-    WHEN OTHERS THEN
-        RETURN -1;
-END;
-/
-
--- Llamada a la funciï¿½n obtener_precio_promedio_servicios
-DECLARE
-    v_precio_promedio NUMBER;
-BEGIN
-    v_precio_promedio := obtener_precio_promedio_servicios();
-    DBMS_OUTPUT.PUT_LINE('Precio promedio de los servicios: ' || v_precio_promedio);
-END;
-/
-
--- Habilitar la salida de DBMS_OUTPUT para la funciï¿½n
-SET SERVEROUTPUT ON;
-
--- Funciï¿½n 9: Obtener empleados por cargo
-CREATE OR REPLACE FUNCTION obtener_empleados_por_cargo(p_cargo IN VARCHAR2)
-RETURN SYS_REFCURSOR IS
-    v_cursor SYS_REFCURSOR;
-BEGIN
-    OPEN v_cursor FOR
-        SELECT e.NOMBRE_EMPLEADO, e.CARGO
-        FROM EMPLEADOS e
-        WHERE e.CARGO = p_cargo;
-
-    RETURN v_cursor;
-EXCEPTION
-    WHEN OTHERS THEN
-        DBMS_OUTPUT.PUT_LINE('Error: ' || SQLERRM);
-        RETURN NULL;
-END;
-/
-
--- Llamada a la funciï¿½n obtener_empleados_por_cargo
-DECLARE
-    v_cursor SYS_REFCURSOR;
-    v_nombre_empleado EMPLEADOS.NOMBRE_EMPLEADO%TYPE;
-    v_cargo EMPLEADOS.CARGO%TYPE;
-BEGIN
-    v_cursor := obtener_empleados_por_cargo('Mecï¿½nico'); -- Cambiar el cargo segï¿½n sea necesario
-    
-    LOOP
-        FETCH v_cursor INTO v_nombre_empleado, v_cargo;
-        EXIT WHEN v_cursor%NOTFOUND;
-        
-        DBMS_OUTPUT.PUT_LINE('Nombre Empleado: ' || v_nombre_empleado || ', Cargo: ' || v_cargo);
-    END LOOP;
-    
-    CLOSE v_cursor;
-END;
-/
-
--- Habilitar la salida de DBMS_OUTPUT para la funciï¿½n
-SET SERVEROUTPUT ON;
-
--- Funciï¿½n 10: Obtener repuestos en stock
-CREATE OR REPLACE FUNCTION obtener_repuestos_en_stock
-RETURN SYS_REFCURSOR IS
-    v_cursor SYS_REFCURSOR;
-BEGIN
-    OPEN v_cursor FOR
-        SELECT r.NOMBRE_REPUESTO, r.STOCK
-        FROM REPUESTOS r
-        WHERE r.STOCK > 0;
-
-    RETURN v_cursor;
-EXCEPTION
-    WHEN OTHERS THEN
-        DBMS_OUTPUT.PUT_LINE('Error: ' || SQLERRM);
-        RETURN NULL;
-END;
-/
-
--- Llamada a la funciï¿½n obtener_repuestos_en_stock
-DECLARE
-    v_cursor SYS_REFCURSOR;
-    v_nombre_repuesto REPUESTOS.NOMBRE_REPUESTO%TYPE;
-    v_stock REPUESTOS.STOCK%TYPE;
-BEGIN
-    v_cursor := obtener_repuestos_en_stock();
-    
-    LOOP
-        FETCH v_cursor INTO v_nombre_repuesto, v_stock;
-        EXIT WHEN v_cursor%NOTFOUND;
-        
-        DBMS_OUTPUT.PUT_LINE('Nombre Repuesto: ' || v_nombre_repuesto || ', Stock: ' || v_stock);
-    END LOOP;
-    
-    CLOSE v_cursor;
-END;
-/
-
--- Habilitar la salida de DBMS_OUTPUT para la funciï¿½n
-SET SERVEROUTPUT ON;
-
--- Funciï¿½n 11: Obtener clientes con mï¿½s de una factura
-CREATE OR REPLACE FUNCTION clientes_con_mas_de_una_factura
-RETURN SYS_REFCURSOR IS
-    v_cursor SYS_REFCURSOR;
-BEGIN
-    OPEN v_cursor FOR
-        SELECT c.NOMBRE_CLIENTE, COUNT(f.ID_FACTURA) AS NUM_FACTURAS
-        FROM CLIENTES c
-        JOIN FACTURAS f ON c.ID_CLIENTE = f.COD_CLIENTE
-        GROUP BY c.NOMBRE_CLIENTE
-        HAVING COUNT(f.ID_FACTURA) > 1;
-
-    RETURN v_cursor;
-EXCEPTION
-    WHEN OTHERS THEN
-        DBMS_OUTPUT.PUT_LINE('Error: ' || SQLERRM);
-        RETURN NULL;
-END;
-/
-
--- Llamada a la funciï¿½n clientes_con_mas_de_una_factura
-DECLARE
-    v_cursor SYS_REFCURSOR;
-    v_nombre_cliente CLIENTES.NOMBRE_CLIENTE%TYPE;
-    v_num_facturas INTEGER;
-BEGIN
-    v_cursor := clientes_con_mas_de_una_factura();
-    
-    LOOP
-        FETCH v_cursor INTO v_nombre_cliente, v_num_facturas;
-        EXIT WHEN v_cursor%NOTFOUND;
-        
-        DBMS_OUTPUT.PUT_LINE('Cliente: ' || v_nombre_cliente || ', Nï¿½mero de Facturas: ' || v_num_facturas);
-    END LOOP;
-    
-    CLOSE v_cursor;
-END;
-/
-
--- Habilitar la salida de DBMS_OUTPUT para la funciï¿½n
-SET SERVEROUTPUT ON;
-
--- Funciï¿½n 12: Contar servicios en una oficina
-CREATE OR REPLACE FUNCTION contar_servicios_oficina(p_id_oficina IN INTEGER)
-RETURN INTEGER IS
-    v_num_servicios INTEGER;
-BEGIN
-    SELECT COUNT(*)
-    INTO v_num_servicios
-    FROM SERVICIOS s
-    JOIN EMPLEADOS e ON s.COD_SERVICIO = e.ID_EMPLEADO
-    WHERE e.ID_OFICINA = p_id_oficina;
-
-    RETURN v_num_servicios;
-EXCEPTION
-    WHEN OTHERS THEN
-        RETURN -1;
-END;
-/
-
--- Llamada a la funciï¿½n contar_servicios_oficina
-DECLARE
-    v_num_servicios INTEGER;
-BEGIN
-    v_num_servicios := contar_servicios_oficina(1); -- Cambiar el ID de la oficina segï¿½n sea necesario
-    DBMS_OUTPUT.PUT_LINE('Nï¿½mero de servicios en la oficina: ' || v_num_servicios);
-END;
-/
-
--- Habilitar la salida de DBMS_OUTPUT para la funciï¿½n
-SET SERVEROUTPUT ON;
-
--- Funciï¿½n 13: Calcular el costo total de los repuestos de una factura
-CREATE OR REPLACE FUNCTION calcular_costo_repuestos_factura(p_id_factura IN INTEGER)
-RETURN NUMBER IS
-    v_costo_total NUMBER(10, 2);
-BEGIN
-    SELECT SUM(r.PRECIO_REPUESTO * df.CANTIDAD)
-    INTO v_costo_total
+    SELECT SUM(df.CANTIDAD * r.PRECIO_REPUESTO) INTO v_total
     FROM DETALLE_FACTURA df
     JOIN REPUESTOS r ON df.COD_REPUESTO = r.ID_REPUESTO
     WHERE df.COD_FACTURA = p_id_factura;
-
-    RETURN v_costo_total;
+    RETURN NVL(v_total, 0);
 EXCEPTION
     WHEN NO_DATA_FOUND THEN
         RETURN 0;
-    WHEN OTHERS THEN
-        RETURN -1;
-END;
+END calcular_total_factura;
 /
-
--- Llamada a la funciï¿½n calcular_costo_repuestos_factura
-DECLARE
-    v_costo_total NUMBER;
+-- Llamada a la función 2
 BEGIN
-    v_costo_total := calcular_costo_repuestos_factura(2); -- Cambiar el ID de la factura segï¿½n sea necesario
-    DBMS_OUTPUT.PUT_LINE('Costo total de los repuestos de la factura: ' || v_costo_total);
+    DBMS_OUTPUT.PUT_LINE('Total de la factura: ' || calcular_total_factura(1));
 END;
 /
-
--- Habilitar la salida de DBMS_OUTPUT para la funciï¿½n
-SET SERVEROUTPUT ON;
-
--- Funciï¿½n 14: Obtener nï¿½mero de repuestos por tipo
-CREATE OR REPLACE FUNCTION contar_repuestos_por_tipo(p_tipo IN VARCHAR2)
-RETURN INTEGER IS
-    v_num_repuestos INTEGER;
-BEGIN
-    SELECT COUNT(*)
-    INTO v_num_repuestos
-    FROM REPUESTOS
-    WHERE TIPO_REPUESTO = p_tipo;
-
-    RETURN v_num_repuestos;
-EXCEPTION
-    WHEN OTHERS THEN
-        RETURN -1;
-END;
-/
-
--- Llamada a la funciï¿½n contar_repuestos_por_tipo
-DECLARE
-    v_num_repuestos INTEGER;
-BEGIN
-    v_num_repuestos := contar_repuestos_por_tipo('Filtro'); -- Cambiar el tipo de repuesto segï¿½n sea necesario
-    DBMS_OUTPUT.PUT_LINE('Nï¿½mero de repuestos del tipo especificado: ' || v_num_repuestos);
-END;
-/
-
--- Habilitar la salida de DBMS_OUTPUT para la funciï¿½n
-SET SERVEROUTPUT ON;
-
--- Funciï¿½n 15: Obtener las oficinas con mï¿½s servicios
-CREATE OR REPLACE FUNCTION obtener_oficinas_con_mas_servicios
-RETURN SYS_REFCURSOR IS
+--------------------------------------------------------------------------------
+-- Función 3: Obtener la lista de repuestos en una factura por ID_FACTURA
+CREATE OR REPLACE FUNCTION listar_repuestos_factura (p_id_factura INTEGER) RETURN SYS_REFCURSOR IS
     v_cursor SYS_REFCURSOR;
 BEGIN
     OPEN v_cursor FOR
-        SELECT e.ID_OFICINA, COUNT(s.COD_SERVICIO) AS NUM_SERVICIOS
-        FROM EMPLEADOS e
-        JOIN SERVICIOS s ON s.COD_SERVICIO = e.ID_EMPLEADO
-        GROUP BY e.ID_OFICINA
-        ORDER BY NUM_SERVICIOS DESC;
-
+        SELECT r.NOMBRE_REPUESTO, df.CANTIDAD, r.PRECIO_REPUESTO
+        FROM DETALLE_FACTURA df
+        JOIN REPUESTOS r ON df.COD_REPUESTO = r.ID_REPUESTO
+        WHERE df.COD_FACTURA = p_id_factura;
     RETURN v_cursor;
-EXCEPTION
-    WHEN OTHERS THEN
-        DBMS_OUTPUT.PUT_LINE('Error: ' || SQLERRM);
-        RETURN NULL;
-END;
+END listar_repuestos_factura;
 /
-
--- Llamada a la funciï¿½n obtener_oficinas_con_mas_servicios
+-- Llamada a la función 3
 DECLARE
     v_cursor SYS_REFCURSOR;
-    v_id_oficina EMPLEADOS.ID_OFICINA%TYPE;
-    v_num_servicios INTEGER;
+    v_nombre_repuesto VARCHAR2(100);
+    v_cantidad INTEGER;
+    v_precio NUMBER(10,2);
 BEGIN
-    v_cursor := obtener_oficinas_con_mas_servicios();
-    
+    v_cursor := listar_repuestos_factura(1);
     LOOP
-        FETCH v_cursor INTO v_id_oficina, v_num_servicios;
+        FETCH v_cursor INTO v_nombre_repuesto, v_cantidad, v_precio;
         EXIT WHEN v_cursor%NOTFOUND;
-        
-        DBMS_OUTPUT.PUT_LINE('ID Oficina: ' || v_id_oficina || ', Nï¿½mero de Servicios: ' || v_num_servicios);
+        DBMS_OUTPUT.PUT_LINE('Repuesto: ' || v_nombre_repuesto || 
+                             ', Cantidad: ' || v_cantidad || 
+                             ', Precio Unitario: ' || v_precio);
     END LOOP;
-    
     CLOSE v_cursor;
 END;
 /
-
+--------------------------------------------------------------------------------
+-- Función 4: Obtener la información de una oficina por su ID
+CREATE OR REPLACE FUNCTION obtener_informacion_oficina (p_id_oficina INTEGER) RETURN VARCHAR2 IS
+    v_info VARCHAR2(200);
+BEGIN
+    SELECT 'Nombre: ' || NOMBRE_OFICINA || ', Fecha Registro: ' || TO_CHAR(FECHA_REGISTRO, 'DD/MM/YYYY')
+    INTO v_info
+    FROM OFICINAS
+    WHERE ID_OFICINA = p_id_oficina;
+    RETURN v_info;
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        RETURN 'Oficina no encontrada';
+END obtener_informacion_oficina;
+/
+-- Llamada a la función 4
+BEGIN
+    DBMS_OUTPUT.PUT_LINE('Información de la oficina: ' || obtener_informacion_oficina(1));
+END;
+/
+--------------------------------------------------------------------------------
+-- Función 5: Listar vehículos por tipo de vehículo
+CREATE OR REPLACE FUNCTION listar_vehiculos_por_tipo (p_tipo VARCHAR2) RETURN SYS_REFCURSOR IS
+    v_cursor SYS_REFCURSOR;
+BEGIN
+    OPEN v_cursor FOR
+        SELECT NUM_PLACA, MARCA, MODELO, ESTADO_VEHICULO
+        FROM VEHICULOS
+        WHERE TIPO_VEHICULO = p_tipo;
+    RETURN v_cursor;
+END listar_vehiculos_por_tipo;
+/
+-- Llamada a la función 5
+DECLARE
+    v_cursor SYS_REFCURSOR;
+    v_num_placa VARCHAR2(100);
+    v_marca VARCHAR2(100);
+    v_modelo VARCHAR2(100);
+    v_estado VARCHAR2(100);
+BEGIN
+    v_cursor := listar_vehiculos_por_tipo('Sedan');
+    LOOP
+        FETCH v_cursor INTO v_num_placa, v_marca, v_modelo, v_estado;
+        EXIT WHEN v_cursor%NOTFOUND;
+        DBMS_OUTPUT.PUT_LINE('Placa: ' || v_num_placa || 
+                             ', Marca: ' || v_marca || 
+                             ', Modelo: ' || v_modelo || 
+                             ', Estado: ' || v_estado);
+    END LOOP;
+    CLOSE v_cursor;
+END;
+/
+--------------------------------------------------------------------------------
+-- Función 6: Obtener el salario anual de un empleado por su ID
+CREATE OR REPLACE FUNCTION obtener_salario_anual (p_id_empleado INTEGER) RETURN NUMBER IS
+    v_salario_mensual NUMBER(10,2);
+BEGIN
+    SELECT SALARIO INTO v_salario_mensual FROM EMPLEADOS WHERE ID_EMPLEADO = p_id_empleado;
+    RETURN v_salario_mensual * 12;
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        RETURN 0;
+END obtener_salario_anual;
+/
+-- Llamada a la función 6
+BEGIN
+    DBMS_OUTPUT.PUT_LINE('Salario anual del empleado: ' || obtener_salario_anual(1));
+END;
+/
+--------------------------------------------------------------------------------
+-- Función 7: Obtener la descripción de un servicio por su código
+CREATE OR REPLACE FUNCTION obtener_descripcion_servicio (p_cod_servicio INTEGER) RETURN VARCHAR2 IS
+    v_descripcion VARCHAR2(200);
+BEGIN
+    SELECT DESCRIPCION_SERVICIO INTO v_descripcion 
+    FROM SERVICIOS 
+    WHERE COD_SERVICIO = p_cod_servicio;
+    RETURN v_descripcion;
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        RETURN 'Servicio no encontrado';
+END obtener_descripcion_servicio;
+/
+-- Llamada a la función 7
+BEGIN
+    DBMS_OUTPUT.PUT_LINE('Descripción del servicio: ' || obtener_descripcion_servicio(101));
+END;
+/
+--------------------------------------------------------------------------------
+-- Función 8: Listar empleados por cargo
+CREATE OR REPLACE FUNCTION listar_empleados_por_cargo (p_cargo VARCHAR2) RETURN SYS_REFCURSOR IS
+    v_cursor SYS_REFCURSOR;
+BEGIN
+    OPEN v_cursor FOR
+        SELECT NOMBRE_EMPLEADO, APELLIDO_EMPLEADO, SALARIO
+        FROM EMPLEADOS
+        WHERE CARGO_EMPLEADO = p_cargo;
+    RETURN v_cursor;
+END listar_empleados_por_cargo;
+/
+-- Llamada a la función 8
+DECLARE
+    v_cursor SYS_REFCURSOR;
+    v_nombre VARCHAR2(100);
+    v_apellido VARCHAR2(100);
+    v_salario NUMBER(10,2);
+BEGIN
+    v_cursor := listar_empleados_por_cargo('Gerente');
+    LOOP
+        FETCH v_cursor INTO v_nombre, v_apellido, v_salario;
+        EXIT WHEN v_cursor%NOTFOUND;
+        DBMS_OUTPUT.PUT_LINE('Empleado: ' || v_nombre || ' ' || v_apellido || 
+                             ', Salario: ' || v_salario);
+    END LOOP;
+    CLOSE v_cursor;
+END;
+/
+--------------------------------------------------------------------------------
+-- Función 9: Calcular el total de repuestos vendidos para un repuesto por su código
+CREATE OR REPLACE FUNCTION total_repuestos_vendidos (p_cod_repuesto INTEGER) RETURN INTEGER IS
+    v_total INTEGER;
+BEGIN
+    SELECT SUM(CANTIDAD) INTO v_total
+    FROM DETALLE_FACTURA
+    WHERE COD_REPUESTO = p_cod_repuesto;
+    RETURN NVL(v_total, 0);
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        RETURN 0;
+END total_repuestos_vendidos;
+/
+-- Llamada a la función 9
+BEGIN
+    DBMS_OUTPUT.PUT_LINE('Total de repuestos vendidos: ' || total_repuestos_vendidos(1));
+END;
+/
+--------------------------------------------------------------------------------
+-- Función 10: Obtener la fecha de contratación de un empleado por su ID
+CREATE OR REPLACE FUNCTION obtener_fecha_contratacion (p_id_empleado INTEGER) RETURN VARCHAR2 IS
+    v_fecha DATE;
+BEGIN
+    SELECT FECHA_CONTRATACION INTO v_fecha 
+    FROM EMPLEADOS 
+    WHERE ID_EMPLEADO = p_id_empleado;
+    RETURN TO_CHAR(v_fecha, 'DD/MM/YYYY');
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        RETURN 'Empleado no encontrado';
+END obtener_fecha_contratacion;
+/
+-- Llamada a la función 10
+BEGIN
+    DBMS_OUTPUT.PUT_LINE('Fecha de contratación: ' || obtener_fecha_contratacion(1));
+END;
+/
+--------------------------------------------------------------------------------
+-- Función 11: Verificar si un contacto tiene facturas asociadas
+CREATE OR REPLACE FUNCTION contacto_tiene_facturas (p_id_contacto INTEGER) RETURN VARCHAR2 IS
+    v_existe NUMBER;
+BEGIN
+    SELECT COUNT(*) INTO v_existe 
+    FROM FACTURAS 
+    WHERE COD_CLIENTE = p_id_contacto;
+    IF v_existe > 0 THEN
+        RETURN 'Sí';
+    ELSE
+        RETURN 'No';
+    END IF;
+END contacto_tiene_facturas;
+/
+-- Llamada a la función 11
+BEGIN
+    DBMS_OUTPUT.PUT_LINE('¿El contacto tiene facturas asociadas? ' || contacto_tiene_facturas(1));
+END;
+/
+--------------------------------------------------------------------------------
+-- Función 12: Listar facturas entre dos fechas
+CREATE OR REPLACE FUNCTION listar_facturas_por_fecha (p_fecha_inicio DATE, p_fecha_fin DATE) RETURN SYS_REFCURSOR IS
+    v_cursor SYS_REFCURSOR;
+BEGIN
+    OPEN v_cursor FOR
+        SELECT COD_FACTURA, FECHA_FACTURA, TOTAL_FACTURA
+        FROM FACTURAS
+        WHERE FECHA_FACTURA BETWEEN p_fecha_inicio AND p_fecha_fin;
+    RETURN v_cursor;
+END listar_facturas_por_fecha;
+/
+-- Llamada a la función 12
+DECLARE
+    v_cursor SYS_REFCURSOR;
+    v_cod_factura INTEGER;
+    v_fecha_factura DATE;
+    v_total NUMBER(10,2);
+BEGIN
+    v_cursor := listar_facturas_por_fecha(TO_DATE('2023-01-01','YYYY-MM-DD'), TO_DATE('2023-12-31','YYYY-MM-DD'));
+    LOOP
+        FETCH v_cursor INTO v_cod_factura, v_fecha_factura, v_total;
+        EXIT WHEN v_cursor%NOTFOUND;
+        DBMS_OUTPUT.PUT_LINE('Factura: ' || v_cod_factura || 
+                             ', Fecha: ' || TO_CHAR(v_fecha_factura, 'DD/MM/YYYY') || 
+                             ', Total: ' || v_total);
+    END LOOP;
+    CLOSE v_cursor;
+END;
+/
+--------------------------------------------------------------------------------
+-- Función 13: Obtener la lista de contactos por tipo (Cliente o Proveedor)
+CREATE OR REPLACE FUNCTION listar_contactos_por_tipo (p_tipo VARCHAR2) RETURN SYS_REFCURSOR IS
+    v_cursor SYS_REFCURSOR;
+BEGIN
+    OPEN v_cursor FOR
+        SELECT COD_CONTACTO, NOMBRE_CONTACTO, EMAIL_CONTACTO
+        FROM CONTACTOS
+        WHERE TIPO_CONTACTO = p_tipo;
+    RETURN v_cursor;
+END listar_contactos_por_tipo;
+/
+-- Llamada a la función 13
+DECLARE
+    v_cursor SYS_REFCURSOR;
+    v_cod_contacto INTEGER;
+    v_nombre VARCHAR2(100);
+    v_email VARCHAR2(100);
+BEGIN
+    v_cursor := listar_contactos_por_tipo('Cliente');
+    LOOP
+        FETCH v_cursor INTO v_cod_contacto, v_nombre, v_email;
+        EXIT WHEN v_cursor%NOTFOUND;
+        DBMS_OUTPUT.PUT_LINE('Contacto ID: ' || v_cod_contacto || 
+                             ', Nombre: ' || v_nombre || 
+                             ', Email: ' || v_email);
+    END LOOP;
+    CLOSE v_cursor;
+END;
+/
+--------------------------------------------------------------------------------
+-- Función 14: Calcular el promedio de salario de los empleados
+CREATE OR REPLACE FUNCTION promedio_salario_empleados RETURN NUMBER IS
+    v_promedio NUMBER(10,2);
+BEGIN
+    SELECT AVG(SALARIO) INTO v_promedio FROM EMPLEADOS;
+    RETURN NVL(v_promedio, 0);
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        RETURN 0;
+END promedio_salario_empleados;
+/
+-- Llamada a la función 14
+BEGIN
+    DBMS_OUTPUT.PUT_LINE('Promedio de salario de empleados: ' || promedio_salario_empleados());
+END;
+/
+--------------------------------------------------------------------------------
+-- Función 15: Obtener el nombre de la oficina con más registros
+CREATE OR REPLACE FUNCTION oficina_con_mas_registros RETURN VARCHAR2 IS
+    v_nombre_oficina VARCHAR2(50);
+BEGIN
+    SELECT NOMBRE_OFICINA INTO v_nombre_oficina
+    FROM OFICINAS
+    WHERE ID_OFICINA = (
+        SELECT ID_OFICINA
+        FROM OFICINAS
+        ORDER BY ID_OFICINA DESC
+        FETCH FIRST 1 ROWS ONLY
+    );
+    RETURN v_nombre_oficina;
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        RETURN 'No hay oficinas registradas';
+END oficina_con_mas_registros;
+/
+-- Llamada a la función 15
+BEGIN
+    DBMS_OUTPUT.PUT_LINE('Oficina con más registros: ' || oficina_con_mas_registros());
+END;
+/
 
 /*
 **********************************************************************
