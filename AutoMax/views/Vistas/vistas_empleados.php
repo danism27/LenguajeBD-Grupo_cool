@@ -1,5 +1,6 @@
 <?php
-include '../../DAL/conexion.php';
+include '../DAL/conexion.php';
+
  
 // Establecer la conexión
 try {
@@ -10,30 +11,18 @@ try {
 }
  
 // Preparar la consulta para la vista FIDE_PROMOCIONES_ACTIVAS_V
-$query_select_vehiculos_activos = 'SELECT * FROM V_VEHICULOS_ACTIVOS';
-$stmt_select_vehiculos_activos = $conexion->prepare($query_select_vehiculos_activos);
+$query_select_empleados_salarios = 'SELECT * FROM V_EMPLEADOS_SALARIOS';
+$stmt_select_empleados_salarios = $conexion->prepare($query_select_empleados_salarios);
  
 try {
     // Ejecutar la consulta
-    $stmt_select_vehiculos_activos->execute();
+    $stmt_select_empleados_salarios->execute();
 } catch (PDOException $e) {
     echo "Error al ejecutar la consulta: " . $e->getMessage();
     exit();
 }
 
-// Preparar la consulta para la vista FIDE_PROMOCIONES_ACTIVAS_V
-$query_select_estado_registro = 'SELECT * FROM V_VEHICULOS_ESTADO_REGISTRO';
-$stmt_select_estado_registro = $conexion->prepare($query_select_estado_registro);
- 
-try {
-    // Ejecutar la consulta
-    $stmt_select_estado_registro->execute();
-} catch (PDOException $e) {
-    echo "Error al ejecutar la consulta: " . $e->getMessage();
-    exit();
-}
 
- 
 ?>
  
 <!DOCTYPE html>
@@ -163,14 +152,14 @@ tr:hover {
 <center> <h1><a href="../tablas.php" style="text-decoration: none; color: #000000;">Visualización AutoMax</a></h1><center>
  
 <!-- Tabla para mostrar promociones activas -->
-<center><h2>Vehiculos Activos</h2><center>
+<center><h2>Salarios de los Empleados</h2><center>
 
 <?php
 // Mostrar los datos en la tabla
 echo '<table border="1">';
-echo '<tr><th>NUM_PLACA</th><th>TIPO_VEHICULO</th><th>MARCA</th><th>MODELO</th><th>FECHA_REGISTRO</th></tr>';
+echo '<tr><th>NOMBRE_EMPLEADO</th><th>APELLIDO_EMPLEADO</th><th>CARGO_EMPLEADO</th><th>FECHA_CONTRATACION</th><th>SALARIO</th></tr>';
  
-while ($row = $stmt_select_vehiculos_activos->fetch(PDO::FETCH_ASSOC)) {
+while ($row = $stmt_select_empleados_salarios->fetch(PDO::FETCH_ASSOC)) {
     echo '<tr>';
     foreach ($row as $key => $value) {
         echo '<td>' . htmlspecialchars($value) . '</td>';
@@ -182,28 +171,6 @@ echo '</table>';
 // Desconectar
 Desconectar($conexion);
 ?>
-
-<!-- Tabla para mostrar promociones activas -->
-<center><h2>Registro del Estado de los Vehiculos</h2><center>
-
-<?php
-// Mostrar los datos en la tabla
-echo '<table border="1">';
-echo '<tr><th>NUM_PLACA</th><th>TIPO_VEHICULO</th><th>ESTADO_VEHICULO</th><th>FECHA_REGISTRO</th></tr>';
- 
-while ($row = $stmt_select_estado_registro->fetch(PDO::FETCH_ASSOC)) {
-    echo '<tr>';
-    foreach ($row as $key => $value) {
-        echo '<td>' . htmlspecialchars($value) . '</td>';
-    }
-    echo '</tr>';
-}
-echo '</table>';
- 
-// Desconectar
-Desconectar($conexion);
-?>
-
  
 </body>
 </html>

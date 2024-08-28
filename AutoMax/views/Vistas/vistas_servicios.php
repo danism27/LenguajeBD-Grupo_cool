@@ -1,5 +1,6 @@
 <?php
-include '../../DAL/conexion.php';
+include '../DAL/conexion.php';
+
  
 // Establecer la conexión
 try {

@@ -1,5 +1,6 @@
 <?php
-include '../../DAL/conexion.php';
+include '../DAL/conexion.php';
+
  
 // Establecer la conexión
 try {
@@ -10,18 +11,18 @@ try {
 }
  
 // Preparar la consulta para la vista FIDE_PROMOCIONES_ACTIVAS_V
-$query_select_empleados_salarios = 'SELECT * FROM V_EMPLEADOS_SALARIOS';
-$stmt_select_empleados_salarios = $conexion->prepare($query_select_empleados_salarios);
+$query_select_proveedores = 'SELECT * FROM V_PROVEEDORES';
+$stmt_select_proveedores = $conexion->prepare($query_select_proveedores);
  
 try {
     // Ejecutar la consulta
-    $stmt_select_empleados_salarios->execute();
+    $stmt_select_proveedores->execute();
 } catch (PDOException $e) {
     echo "Error al ejecutar la consulta: " . $e->getMessage();
     exit();
 }
 
-
+ 
 ?>
  
 <!DOCTYPE html>
@@ -151,14 +152,14 @@ tr:hover {
 <center> <h1><a href="../tablas.php" style="text-decoration: none; color: #000000;">Visualización AutoMax</a></h1><center>
  
 <!-- Tabla para mostrar promociones activas -->
-<center><h2>Salarios de los Empleados</h2><center>
+<center><h2>Proveedores de AutoMax</h2><center>
 
 <?php
 // Mostrar los datos en la tabla
 echo '<table border="1">';
-echo '<tr><th>NOMBRE_EMPLEADO</th><th>APELLIDO_EMPLEADO</th><th>CARGO_EMPLEADO</th><th>FECHA_CONTRATACION</th><th>SALARIO</th></tr>';
+echo '<tr><th>ID_CONTACTO</th><th>NOMBRE_CONTACTO</th><th>DIRECCION_CONTACTO</th><th>TELEFONO_CONTACTO</th><th>EMAIL_CONTACTO</th></tr>';
  
-while ($row = $stmt_select_empleados_salarios->fetch(PDO::FETCH_ASSOC)) {
+while ($row = $stmt_select_proveedores->fetch(PDO::FETCH_ASSOC)) {
     echo '<tr>';
     foreach ($row as $key => $value) {
         echo '<td>' . htmlspecialchars($value) . '</td>';
@@ -170,6 +171,7 @@ echo '</table>';
 // Desconectar
 Desconectar($conexion);
 ?>
+
  
 </body>
 </html>
