@@ -30,6 +30,11 @@
             <a href="ordenes.php" class="list-group-item list-group-item-action">Órdenes</a>
             <a href="productos.php" class="list-group-item list-group-item-action">Productos</a>
             <a href="autores.php" class="list-group-item list-group-item-action">Autores</a>
+            <a href="Oficinas_CRUD/vistas_clientes.php" class="list-group-item list-group-item-action">Vistas del Cliente</a>
+            <a href="Oficinas_CRUD/vistas_proveedores.php" class="list-group-item list-group-item-action">Vistas de los Proveedores</a>
+            <a href="Oficinas_CRUD/vistas_servicios.php" class="list-group-item list-group-item-action">Vistas de los Servicios</a>
+            <a href="Oficinas_CRUD/vistas_vehiculos.php" class="list-group-item list-group-item-action">Vistas de los Vehículos</a>
+            <a href="Oficinas_CRUD/vistas_empleados.php" class="list-group-item list-group-item-action">Vistas de los Empleados</a>
         </div>
     </div>
 </body>
