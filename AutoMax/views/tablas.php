@@ -23,14 +23,14 @@
     <div class="container">
         <h1 class="text-center">Menú de Tablas</h1>
         <div class="list-group">
-            <a href="Oficinas_CRUD/Tabla_Oficinas.php" class="list-group-item list-group-item-action">Oficinas</a>
-            <a href="Vehiculos_CRUD/Tabla_Vehiculo.php" class="list-group-item list-group-item-action">Vehículos</a>
-            <a href="vehiculos.php" class="list-group-item list-group-item-action">Vehículos    ❎</a>
-            <a href="servicios.php" class="list-group-item list-group-item-action">Servicios    ❎</a>
-            <a href="clientes.php" class="list-group-item list-group-item-action">Clientes  ❎</a>
-            <a href="ordenes.php" class="list-group-item list-group-item-action">Órdenes    ❎</a>
-            <a href="productos.php" class="list-group-item list-group-item-action">Productos    ❎</a>
-            <a href="autores.php" class="list-group-item list-group-item-action">Autores    ❎</a>
+            <a href="CRUD/Oficinas_CRUD/Tabla_Oficinas.php" class="list-group-item list-group-item-action">Oficinas</a>
+            <a href="CRUD/Vehiculos_CRUD/Tabla_Vehiculo.php" class="list-group-item list-group-item-action">Vehículos</a>
+            <a href="vehiculos.php" class="list-group-item list-group-item-action">Contactos    ❎</a>
+            <a href="ordenes.php" class="list-group-item list-group-item-action">Facturas    ❎</a>
+            <a href="servicios.php" class="list-group-item list-group-item-action">Detalles Facturas    ❎</a>
+            <a href="ordenes.php" class="list-group-item list-group-item-action">Repuestos    ❎</a>
+            <a href="clientes.php" class="list-group-item list-group-item-action">Servicios  ❎</a>
+            <a href="clientes.php" class="list-group-item list-group-item-action">Empleados  ❎</a>
 
         </div>
     </div>
