@@ -34,7 +34,7 @@
             <!-- Botones para Crear y Leer -->
             <div class="mb-3 d-flex justify-content-center align-items-center">
                 <!-- Mini Formulario para Leer Repuesto Específico -->
-                <form action="leer_repuesto.php" method="GET" class="form-inline d-flex mr-3">
+                <form action="Leer_Repuesto.php" method="GET" class="form-inline d-flex mr-3">
                     <label for="id_repuesto" class="mr-2">Buscar Repuesto por ID:</label>
                     <input type="number" id="id_repuesto" name="id_repuesto" class="form-control mr-2" required>
                     <button type="submit" class="btn btn-primary">Leer</button>
@@ -80,8 +80,8 @@
                         echo "<td>" . htmlentities($row['NOMBRE_REPUESTO'], ENT_QUOTES) . "</td>\n";
                         echo "<td>" . htmlentities($row['FECHA_REGISTRO'], ENT_QUOTES) . "</td>\n";
                         echo "<td>" . htmlentities($row['NOMBRE_USUARIO'], ENT_QUOTES) . "</td>\n";
-                        echo "<td><a href='Actualizar_Repuesto.php?id=" . $row['ID_REPUESTO'] . "' class='btn btn-warning btn-sm'>Actualizar</a></td>\n";
-                        echo "<td><a href='Procesar_Eliminar_Repuesto.php?id=" . $row['ID_REPUESTO'] . "' class='btn btn-danger btn-sm'>Eliminar</a></td>\n";
+                        echo "<td><a href='Actualizar_Repuesto.php?id=" . urlencode($row['ID_REPUESTO']) . "' class='btn btn-warning btn-sm'>Actualizar</a></td>\n";
+                        echo "<td><a href='Procesar_Eliminar_Repuesto.php?id=" . urlencode($row['ID_REPUESTO']) . "' class='btn btn-danger btn-sm'>Eliminar</a></td>\n";
                         echo "</tr>\n";
                     }
 
@@ -99,16 +99,13 @@
 
 </html>
 <footer>
-
     <div class="footer bg-dark mt-5 p-5 text-center navbar-dark " style="color: white; background-color: #000000 ">
         <div class="container">
             <div class="row">
-
                 <div class="col-md-4">
                     <h3 class="display-5">Autos Max</h3>
                     <p class="mt-3">Autos Fidelitas es una empresa dedicada a la venta de autos nuevos y usados,
-                        alquiler de autos y
-                        venta de repuestos.</p>
+                        alquiler de autos y venta de repuestos.</p>
                 </div>
                 <div class="col-md-4">
                     <h3 class="display-5">Redes Sociales</h3>
@@ -123,4 +120,5 @@
                 </div>
             </div>
         </div>
+    </div>
 </footer>
