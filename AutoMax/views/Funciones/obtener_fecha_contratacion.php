@@ -11,20 +11,25 @@ if (isset($_GET['id'])) {
         exit;
     }
 
-    // Preparar y ejecutar el bloque PL/SQL para obtener la fecha de contratación
-    $sql = 'BEGIN :fecha_contratacion := obtener_fecha_contratacion(:id_empleado); END;';
+    // Preparar y ejecutar el bloque PL/SQL para obtener detalles del empleado
+    $sql = 'BEGIN :cursor := obtener_detalles_empleado(:id_empleado); END;';
     $stid = oci_parse($conn, $sql);
     
     // Bind variables
-    $fecha_contratacion = null;
+    $cursor = oci_new_cursor($conn);
     oci_bind_by_name($stid, ':id_empleado', $id_empleado);
-    oci_bind_by_name($stid, ':fecha_contratacion', $fecha_contratacion, 20);  // Adjust size to match function definition
+    oci_bind_by_name($stid, ':cursor', $cursor, -1, OCI_B_CURSOR);
     
     // Ejecutar el bloque PL/SQL
     oci_execute($stid);
+    oci_execute($cursor);
+    
+    // Fetch the employee details
+    $empleado = oci_fetch_assoc($cursor);
     
     // Libera los recursos
     oci_free_statement($stid);
+    oci_free_statement($cursor);
     oci_close($conn);
 } else {
     echo "<p>No se proporcionó un ID de empleado en la URL.</p>";
@@ -69,10 +74,22 @@ if (isset($_GET['id'])) {
     <div class="container">
         <h1 class="text-center">Detalles del Empleado</h1>
         
-        <div class="alert alert-info">
-            <h4>Fecha de Contratación:</h4>
-            <p><?php echo htmlentities($fecha_contratacion, ENT_QUOTES); ?></p>
-        </div>
+        <?php if ($empleado) : ?>
+            <div class="alert alert-info">
+                <h4>Nombre del Empleado:</h4>
+                <p><?php echo htmlentities($empleado['NOMBRE_EMPLEADO'], ENT_QUOTES); ?></p>
+                <h4>Apellido del Empleado:</h4>
+                <p><?php echo htmlentities($empleado['APELLIDO_EMPLEADO'], ENT_QUOTES); ?></p>
+                <h4>Cargo del Empleado:</h4>
+                <p><?php echo htmlentities($empleado['CARGO_EMPLEADO'], ENT_QUOTES); ?></p>
+                <h4>Fecha de Contratación:</h4>
+                <p><?php echo htmlentities(date('d/m/Y', strtotime($empleado['FECHA_CONTRATACION'])), ENT_QUOTES); ?></p>
+                <h4>Salario:</h4>
+                <p><?php echo htmlentities(number_format($empleado['SALARIO'], 2), ENT_QUOTES); ?></p>
+            </div>
+        <?php else : ?>
+            <p class="text-center">No se encontraron detalles para el empleado con ID proporcionado.</p>
+        <?php endif; ?>
         
         <br>
         <a class="btn btn-secondary" href="index.php">Volver</a>
@@ -82,5 +99,30 @@ if (isset($_GET['id'])) {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 </body>
+
+<footer>
+    <div class="footer bg-dark mt-5 p-5 text-center navbar-dark" style="color: white; background-color: #000000;">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h3 class="display-5">Autos Max</h3>
+                    <p class="mt-3">Autos Fidelitas es una empresa dedicada a la venta de autos nuevos y usados,
+                        alquiler de autos y venta de repuestos.</p>
+                </div>
+                <div class="col-md-4">
+                    <h3 class="display-5">Redes Sociales</h3>
+                    <p><i class="fa fa-facebook" aria-hidden="true"></i> Autos Max</p>
+                    <p><i class="fa fa-instagram" aria-hidden="true"></i> Autos Max</p>
+                    <p><i class="fa fa-twitter" aria-hidden="true"></i> Autos Max</p>
+                </div>
+                <div class="col-md-4">
+                    <h3 class="display-5">Contáctanos</h3>
+                    <p><i class="fa fa-phone" aria-hidden="true"></i> Teléfono: 809-555-5555</p>
+                    <p><i class="fa fa-exclamation-circle" aria-hidden="true"></i> Correo: AutosMax@Ufide.ac.cr</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
 
 </html>

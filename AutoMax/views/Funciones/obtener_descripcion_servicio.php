@@ -18,10 +18,16 @@ if (isset($_GET['cod_servicio'])) {
     // Bind variables
     $descripcion = null;
     oci_bind_by_name($stid, ':cod_servicio', $cod_servicio);
-    oci_bind_by_name($stid, ':descripcion', $descripcion, 200);  // Adjust size to match function definition
+    oci_bind_by_name($stid, ':descripcion', $descripcion, 1000);  // Ajusta el tamaño según sea necesario
     
     // Ejecutar el bloque PL/SQL
-    oci_execute($stid);
+    if (!oci_execute($stid)) {
+        $e = oci_error($stid);
+        echo "<p>Error al ejecutar el bloque PL/SQL: " . htmlentities($e['message'], ENT_QUOTES) . "</p>";
+        oci_free_statement($stid);
+        oci_close($conn);
+        exit;
+    }
     
     // Libera los recursos
     oci_free_statement($stid);

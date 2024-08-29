@@ -11,21 +11,25 @@ if (isset($_GET['id'])) {
         exit;
     }
 
-    // Llamar al procedimiento total_facturas_cliente
-    $sql = 'BEGIN total_facturas_cliente(:cod_cliente); END;';
+    // Preparar y ejecutar el bloque PL/SQL
+    $sql = 'BEGIN :resultado := total_facturas_cliente(:cod_cliente); END;';
     $stid = oci_parse($conn, $sql);
+
+    // Bind variables
+    $resultado = null;
     oci_bind_by_name($stid, ':cod_cliente', $cod_cliente);
-    
-    // Ejecutar la consulta y capturar la salida
+    oci_bind_by_name($stid, ':resultado', $resultado, 100); // Ajustar tamaño del resultado según sea necesario
+
+    // Ejecutar el bloque PL/SQL
     if (!oci_execute($stid)) {
         $e = oci_error($stid);
         echo "<p>Error al ejecutar la consulta: " . htmlentities($e['message'], ENT_QUOTES) . "</p>";
     } else {
-        // Aquí se puede manejar la salida, pero dado que el procedimiento imprime directamente
-        // el resultado con DBMS_OUTPUT.PUT_LINE, no es necesario capturar nada más en PHP.
-        echo "<p>Consulta ejecutada exitosamente.</p>";
+        // Mostrar el resultado obtenido
+        echo "<p>Total de facturas para el cliente con ID " . htmlentities($cod_cliente, ENT_QUOTES) . ": " . htmlentities($resultado, ENT_QUOTES) . "</p>";
     }
 
+    // Liberar recursos
     oci_free_statement($stid);
     oci_close($conn);
 } else {

@@ -11,19 +11,18 @@ if (isset($_GET['id'])) {
         exit;
     }
 
-    // Obtener el total de la factura
+    // Preparar y ejecutar el bloque PL/SQL para obtener el total de la factura
     $sql = 'BEGIN :total := calcular_total_factura(:id_factura); END;';
     $stid = oci_parse($conn, $sql);
     
     // Bind variables
+    $total = null;
     oci_bind_by_name($stid, ':id_factura', $id_factura);
-    oci_bind_by_name($stid, ':total', $total, 10);
+    oci_bind_by_name($stid, ':total', $total, 20); // Adjust size if necessary
     
     // Ejecutar el bloque PL/SQL
     oci_execute($stid);
     oci_free_statement($stid);
-
-    // Cerrar la conexión
     oci_close($conn);
 } else {
     echo "<p>No se proporcionó un ID de factura en la URL.</p>";

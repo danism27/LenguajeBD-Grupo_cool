@@ -23,19 +23,21 @@ if (isset($_GET['precio'])) {
     $sql_output = "DECLARE
                       line VARCHAR2(255);
                       status INTEGER;
+                      result CLOB := '';
                    BEGIN
                       LOOP
                           DBMS_OUTPUT.GET_LINE(line, status);
                           EXIT WHEN status = 1;
-                          :output := :output || line || CHR(10);
+                          result := result || line || CHR(10);
                       END LOOP;
+                      :output := result;
                    END;";
     $stid_output = oci_parse($conn, $sql_output);
-    oci_bind_by_name($stid_output, ':output', $output, 4000);
+    oci_bind_by_name($stid_output, ':output', $output, -1); // Use -1 to handle CLOB size
     oci_execute($stid_output);
     oci_free_statement($stid_output);
 
-    echo "<pre>$output</pre>";
+    echo "<pre>" . htmlentities($output, ENT_QUOTES) . "</pre>";
 
     oci_close($conn);
 } else {
@@ -83,7 +85,7 @@ if (isset($_GET['precio'])) {
         <form action="Servicios_Con_Precio.php" method="GET">
             <div class="form-group">
                 <label for="precio">Precio Mínimo:</label>
-                <input type="number" class="form-control" id="precio" name="precio" required>
+                <input type="number" class="form-control" id="precio" name="precio" step="0.01" required>
             </div>
             <br><br>
             <button type="submit" class="btn btn-primary">Buscar</button>

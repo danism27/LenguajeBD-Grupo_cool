@@ -11,20 +11,25 @@ if (isset($_GET['id'])) {
         exit;
     }
 
-    // Preparar y ejecutar el bloque PL/SQL para obtener el nombre del contacto
-    $sql = 'BEGIN :nombre_contacto := obtener_nombre_contacto(:id_contacto); END;';
+    // Preparar y ejecutar el bloque PL/SQL para obtener detalles del contacto
+    $sql = 'BEGIN :cursor := obtener_detalles_contacto(:id_contacto); END;';
     $stid = oci_parse($conn, $sql);
     
     // Bind variables
-    $nombre_contacto = null;
+    $cursor = oci_new_cursor($conn);
     oci_bind_by_name($stid, ':id_contacto', $id_contacto);
-    oci_bind_by_name($stid, ':nombre_contacto', $nombre_contacto, 100);  // Adjust size to match function definition
+    oci_bind_by_name($stid, ':cursor', $cursor, -1, OCI_B_CURSOR);
     
     // Ejecutar el bloque PL/SQL
     oci_execute($stid);
+    oci_execute($cursor);
+    
+    // Fetch the contact details
+    $contacto = oci_fetch_assoc($cursor);
     
     // Libera los recursos
     oci_free_statement($stid);
+    oci_free_statement($cursor);
     oci_close($conn);
 } else {
     echo "<p>No se proporcionó un ID de contacto en la URL.</p>";
@@ -69,10 +74,24 @@ if (isset($_GET['id'])) {
     <div class="container">
         <h1 class="text-center">Detalles del Contacto</h1>
         
-        <div class="alert alert-info">
-            <h4>Nombre del Contacto:</h4>
-            <p><?php echo htmlentities($nombre_contacto, ENT_QUOTES); ?></p>
-        </div>
+        <?php if ($contacto) : ?>
+            <div class="alert alert-info">
+                <h4>Tipo de Contacto:</h4>
+                <p><?php echo htmlentities($contacto['TIPO_CONTACTO'], ENT_QUOTES); ?></p>
+                <h4>Código de Contacto:</h4>
+                <p><?php echo htmlentities($contacto['COD_CONTACTO'], ENT_QUOTES); ?></p>
+                <h4>Nombre del Contacto:</h4>
+                <p><?php echo htmlentities($contacto['NOMBRE_CONTACTO'], ENT_QUOTES); ?></p>
+                <h4>Dirección del Contacto:</h4>
+                <p><?php echo htmlentities($contacto['DIRECCION_CONTACTO'], ENT_QUOTES); ?></p>
+                <h4>Teléfono del Contacto:</h4>
+                <p><?php echo htmlentities($contacto['TELEFONO_CONTACTO'], ENT_QUOTES); ?></p>
+                <h4>Email del Contacto:</h4>
+                <p><?php echo htmlentities($contacto['EMAIL_CONTACTO'], ENT_QUOTES); ?></p>
+            </div>
+        <?php else : ?>
+            <p class="text-center">No se encontraron detalles para el contacto con ID proporcionado.</p>
+        <?php endif; ?>
         
         <br>
         <a class="btn btn-secondary" href="index.php">Volver</a>
@@ -82,5 +101,30 @@ if (isset($_GET['id'])) {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 </body>
+
+<footer>
+    <div class="footer bg-dark mt-5 p-5 text-center navbar-dark" style="color: white; background-color: #000000;">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h3 class="display-5">Autos Max</h3>
+                    <p class="mt-3">Autos Fidelitas es una empresa dedicada a la venta de autos nuevos y usados,
+                        alquiler de autos y venta de repuestos.</p>
+                </div>
+                <div class="col-md-4">
+                    <h3 class="display-5">Redes Sociales</h3>
+                    <p><i class="fa fa-facebook" aria-hidden="true"></i> Autos Max</p>
+                    <p><i class="fa fa-instagram" aria-hidden="true"></i> Autos Max</p>
+                    <p><i class="fa fa-twitter" aria-hidden="true"></i> Autos Max</p>
+                </div>
+                <div class="col-md-4">
+                    <h3 class="display-5">Contáctanos</h3>
+                    <p><i class="fa fa-phone" aria-hidden="true"></i> Teléfono: 809-555-5555</p>
+                    <p><i class="fa fa-exclamation-circle" aria-hidden="true"></i> Correo: AutosMax@Ufide.ac.cr</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
 
 </html>

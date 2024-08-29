@@ -1,7 +1,7 @@
 <?php
 // Verificar si se ha proporcionado un ID en la URL
 if (isset($_GET['id'])) {
-    $id_vehiculo = $_GET['id'];
+    $id_empleado = $_GET['id'];
 
     // Conectar a la base de datos
     $conn = oci_connect('AutoMax', '123', 'localhost/ORCL');
@@ -12,40 +12,39 @@ if (isset($_GET['id'])) {
     }
 
     // Declarar variables para los parámetros de salida
-    $num_placa = '';
-    $tipo_vehiculo = '';
-    $estado_vehiculo = '';
-    $marca = '';
-    $modelo = '';
-    $fecha_registro = '';
-    $nombre_usuario = '';
+    $nombre_empleado = '';
+    $apellido_empleado = '';
+    $cargo_empleado = '';
+    $fecha_contratacion = '';
+    $salario = '';
 
-    // Obtener los datos actuales del vehículo
-    $sql = 'BEGIN get_vehiculo(:id_vehiculo, :num_placa, :tipo_vehiculo, :estado_vehiculo, :marca, :modelo, :fecha_registro, :nombre_usuario); END;';
+    // Obtener los datos actuales del empleado
+    $sql = 'BEGIN get_empleado(:id_empleado, :nombre_empleado, :apellido_empleado, :cargo_empleado, :fecha_contratacion, :salario); END;';
     $stid = oci_parse($conn, $sql);
-    oci_bind_by_name($stid, ':id_vehiculo', $id_vehiculo);
-    oci_bind_by_name($stid, ':num_placa', $num_placa, 100);
-    oci_bind_by_name($stid, ':tipo_vehiculo', $tipo_vehiculo, 100);
-    oci_bind_by_name($stid, ':estado_vehiculo', $estado_vehiculo, 100);
-    oci_bind_by_name($stid, ':marca', $marca, 100);
-    oci_bind_by_name($stid, ':modelo', $modelo, 100);
-    oci_bind_by_name($stid, ':fecha_registro', $fecha_registro, 50);
-    oci_bind_by_name($stid, ':nombre_usuario', $nombre_usuario, 100);
+    oci_bind_by_name($stid, ':id_empleado', $id_empleado);
+    oci_bind_by_name($stid, ':nombre_empleado', $nombre_empleado, 100);
+    oci_bind_by_name($stid, ':apellido_empleado', $apellido_empleado, 100);
+    oci_bind_by_name($stid, ':cargo_empleado', $cargo_empleado, 100);
+    oci_bind_by_name($stid, ':fecha_contratacion', $fecha_contratacion, 50); // Adjust if needed based on the date format
+    oci_bind_by_name($stid, ':salario', $salario, 10); // Adjust if needed
+
+    // Ejecutar el query
     oci_execute($stid);
 
     // Liberar el statement y cerrar la conexión
     oci_free_statement($stid);
     oci_close($conn);
 } else {
-    echo "<p>No se proporcionó un ID de vehículo en la URL.</p>";
+    echo "<p>No se proporcionó un ID de empleado en la URL.</p>";
     exit();
 }
 ?>
 
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <title>Actualizar Vehículo - Paso 1</title>
+    <title>Actualizar Empleado - Paso 1</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="main.css">
@@ -75,57 +74,45 @@ if (isset($_GET['id'])) {
     <br><br><br><br><br>
 
     <div class="container">
-        <h1 class="text-center">Actualizar Vehículo</h1>
-        <!-- Formulario para ver y enviar los datos del vehículo -->
-        <form action="Procesar_Actualizar_Vehiculo.php" method="GET">
-            <!-- Campo oculto para el ID del vehículo -->
-            <input type="hidden" name="id_vehiculo" value="<?php echo htmlentities($id_vehiculo, ENT_QUOTES); ?>">
+        <h1 class="text-center">Actualizar Empleado</h1>
+        <!-- Formulario para ver y enviar los datos del empleado -->
+        <form action="Procesar_Actualizar_Empleado.php" method="GET">
+            <!-- Campo oculto para el ID del empleado -->
+            <input type="hidden" name="id_empleado" value="<?php echo htmlentities($id_empleado, ENT_QUOTES); ?>">
 
             <div class="form-group">
-                <label for="num_placa">Número de Placa:</label>
-                <input type="text" class="form-control" id="num_placa" name="num_placa"
-                    value="<?php echo htmlentities($num_placa, ENT_QUOTES); ?>" required>
+                <label for="nombre_empleado">Nombre del Empleado:</label>
+                <input type="text" class="form-control" id="nombre_empleado" name="nombre_empleado"
+                    value="<?php echo htmlentities($nombre_empleado, ENT_QUOTES); ?>" required>
             </div>
 
             <div class="form-group">
-                <label for="tipo_vehiculo">Tipo de Vehículo:</label>
-                <input type="text" class="form-control" id="tipo_vehiculo" name="tipo_vehiculo"
-                    value="<?php echo htmlentities($tipo_vehiculo, ENT_QUOTES); ?>" required>
+                <label for="apellido_empleado">Apellido del Empleado:</label>
+                <input type="text" class="form-control" id="apellido_empleado" name="apellido_empleado"
+                    value="<?php echo htmlentities($apellido_empleado, ENT_QUOTES); ?>" required>
             </div>
 
             <div class="form-group">
-                <label for="estado_vehiculo">Estado del Vehículo:</label>
-                <input type="text" class="form-control" id="estado_vehiculo" name="estado_vehiculo"
-                    value="<?php echo htmlentities($estado_vehiculo, ENT_QUOTES); ?>" required>
+                <label for="cargo_empleado">Cargo del Empleado:</label>
+                <input type="text" class="form-control" id="cargo_empleado" name="cargo_empleado"
+                    value="<?php echo htmlentities($cargo_empleado, ENT_QUOTES); ?>" required>
             </div>
 
             <div class="form-group">
-                <label for="marca">Marca:</label>
-                <input type="text" class="form-control" id="marca" name="marca"
-                    value="<?php echo htmlentities($marca, ENT_QUOTES); ?>" required>
+                <label for="fecha_contratacion">Fecha de Contratación:</label>
+                <input type="text" class="form-control" id="fecha_contratacion" name="fecha_contratacion"
+                    value="<?php echo htmlentities($fecha_contratacion, ENT_QUOTES); ?>" required>
             </div>
 
             <div class="form-group">
-                <label for="modelo">Modelo:</label>
-                <input type="text" class="form-control" id="modelo" name="modelo"
-                    value="<?php echo htmlentities($modelo, ENT_QUOTES); ?>" required>
-            </div>
-
-            <div class="form-group">
-                <label for="fecha_registro">Fecha de Registro:</label>
-                <input type="text" class="form-control" id="fecha_registro" name="fecha_registro"
-                    value="<?php echo htmlentities($fecha_registro, ENT_QUOTES); ?>" required>
-            </div>
-
-            <div class="form-group">
-                <label for="nombre_usuario">Nombre del Usuario:</label>
-                <input type="text" class="form-control" id="nombre_usuario" name="nombre_usuario"
-                    value="<?php echo htmlentities($nombre_usuario, ENT_QUOTES); ?>" required>
+                <label for="salario">Salario:</label>
+                <input type="text" class="form-control" id="salario" name="salario"
+                    value="<?php echo htmlentities($salario, ENT_QUOTES); ?>" required>
             </div>
 
             <br><br>
             <button type="submit" class="btn btn-primary">Actualizar</button>
-            <a class="btn btn-secondary" href="Tabla_Vehiculos.php">Volver</a>
+            <a class="btn btn-secondary" href="Tabla_Empleados.php">Volver</a>
         </form>
     </div>
 

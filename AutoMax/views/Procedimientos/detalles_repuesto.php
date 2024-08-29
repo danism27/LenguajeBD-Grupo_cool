@@ -1,5 +1,5 @@
 <?php
-// Verificar si se ha proporcionado un ID en la URL
+// Verificar si se ha proporcionado un código de repuesto en la URL
 if (isset($_GET['id'])) {
     $cod_repuesto = $_GET['id'];
 
@@ -25,7 +25,7 @@ if (isset($_GET['id'])) {
 
     oci_close($conn);
 } else {
-    echo "<p>No se proporcionó un ID de repuesto en la URL.</p>";
+    echo "<p>No se proporcionó un código de repuesto en la URL.</p>";
     exit();
 }
 ?>
@@ -68,9 +68,9 @@ if (isset($_GET['id'])) {
         <h1 class="text-center">Detalles del Repuesto</h1>
         <!-- Mostrar los datos del repuesto -->
         <p><strong>Nombre del Repuesto:</strong> <?php echo htmlentities($nombre_repuesto, ENT_QUOTES); ?></p>
-        <p><strong>Fecha de Registro:</strong> <?php echo htmlentities($fecha_registro, ENT_QUOTES); ?></p>
+        <p><strong>Fecha de Registro:</strong> <?php echo htmlentities(date('d/m/Y', strtotime($fecha_registro)), ENT_QUOTES); ?></p>
         <p><strong>Nombre del Usuario:</strong> <?php echo htmlentities($nombre_usuario, ENT_QUOTES); ?></p>
-        <p><strong>Precio del Repuesto:</strong> <?php echo htmlentities($precio_repuesto, ENT_QUOTES); ?></p>
+        <p><strong>Precio del Repuesto:</strong> <?php echo htmlentities(number_format($precio_repuesto, 2), ENT_QUOTES); ?></p>
         <br><br>
         <a class="btn btn-secondary" href="Tabla_Repuestos.php">Volver</a>
     </div>
@@ -79,6 +79,7 @@ if (isset($_GET['id'])) {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 </body>
+</html>
 
 <footer>
     <div class="footer bg-dark mt-5 p-5 text-center navbar-dark" style="color: white; background-color: #000000;">

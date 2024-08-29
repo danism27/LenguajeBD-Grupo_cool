@@ -24,8 +24,33 @@ if (isset($_GET['id'])) {
         echo "<p>Error al ejecutar el procedimiento: " . htmlentities($e['message'], ENT_QUOTES) . "</p>";
     }
 
+    // Obtener la salida de DBMS_OUTPUT
+    $output = "";
+    $sql_output = "DECLARE
+                      line VARCHAR2(255);
+                      status INTEGER;
+                      result CLOB := '';
+                   BEGIN
+                      LOOP
+                          DBMS_OUTPUT.GET_LINE(line, status);
+                          EXIT WHEN status = 1;
+                          result := result || line || CHR(10);
+                      END LOOP;
+                      :output := result;
+                   END;";
+    $stid_output = oci_parse($conn, $sql_output);
+    oci_bind_by_name($stid_output, ':output', $output, -1); // Use -1 to handle CLOB size
+    oci_execute($stid_output);
+    oci_free_statement($stid_output);
+
+    // Liberar recursos y cerrar la conexión
     oci_free_statement($stid);
     oci_close($conn);
+
+    // Mostrar la salida en HTML
+    echo "<p class='text-center'>Se ha ejecutado el procedimiento para el cliente con ID: " . htmlentities($cod_cliente, ENT_QUOTES) . ".</p>";
+    echo "<pre>" . htmlentities($output, ENT_QUOTES) . "</pre>";
+
 } else {
     echo "<p>No se proporcionó un ID de cliente en la URL.</p>";
     exit();
@@ -68,11 +93,10 @@ if (isset($_GET['id'])) {
         <h1 class="text-center">Ver Ventas del Cliente</h1>
         <p class="text-center">
             <?php
-            echo "Se ha ejecutado el procedimiento para el cliente con ID: " . htmlentities($cod_cliente, ENT_QUOTES) . ".";
+            if (isset($cod_cliente)) {
+                echo "Se ha ejecutado el procedimiento para el cliente con ID: " . htmlentities($cod_cliente, ENT_QUOTES) . ".";
+            }
             ?>
-        </p>
-        <p class="text-center">
-            Revisa la salida del procedimiento en la consola de la base de datos.
         </p>
         <br><br>
         <a class="btn btn-secondary" href="Tabla_Clientes.php">Volver</a>

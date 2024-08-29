@@ -1,5 +1,5 @@
 <?php
-// Verificar si se ha proporcionado las fechas en la URL
+// Verificar si se han proporcionado las fechas en la URL
 if (isset($_GET['fecha_inicio']) && isset($_GET['fecha_fin'])) {
     $fecha_inicio = $_GET['fecha_inicio'];
     $fecha_fin = $_GET['fecha_fin'];
@@ -91,8 +91,8 @@ if (isset($_GET['fecha_inicio']) && isset($_GET['fecha_fin'])) {
                     <?php foreach ($facturas as $factura) : ?>
                         <tr>
                             <td><?php echo htmlentities($factura['COD_FACTURA'], ENT_QUOTES); ?></td>
-                            <td><?php echo htmlentities($factura['FECHA_FACTURA'], ENT_QUOTES); ?></td>
-                            <td><?php echo htmlentities($factura['TOTAL_FACTURA'], ENT_QUOTES); ?></td>
+                            <td><?php echo htmlentities(date('d-m-Y', strtotime($factura['FECHA_FACTURA'])), ENT_QUOTES); ?></td>
+                            <td><?php echo htmlentities(number_format($factura['TOTAL_FACTURA'], 2, ',', '.'), ENT_QUOTES); ?></td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>

@@ -14,23 +14,31 @@ if (isset($_GET['tipo'])) {
     // Preparar y ejecutar el bloque PL/SQL para listar contactos
     $sql = 'BEGIN :cursor := listar_contactos_por_tipo(:tipo_contacto); END;';
     $stid = oci_parse($conn, $sql);
-    
-    // Bind variables
+
+    // Crear un cursor
     $cursor = oci_new_cursor($conn);
     oci_bind_by_name($stid, ':tipo_contacto', $tipo_contacto);
     oci_bind_by_name($stid, ':cursor', $cursor, -1, OCI_B_CURSOR);
-    
+
     // Ejecutar el bloque PL/SQL
-    oci_execute($stid);
+    if (!oci_execute($stid)) {
+        $e = oci_error($stid);
+        echo "<p>Error al ejecutar el bloque PL/SQL: " . htmlentities($e['message'], ENT_QUOTES) . "</p>";
+        oci_free_statement($stid);
+        oci_close($conn);
+        exit;
+    }
+
+    // Ejecutar el cursor
     oci_execute($cursor);
-    
+
     // Fetch all rows from the cursor
     $contactos = [];
     while ($row = oci_fetch_assoc($cursor)) {
         $contactos[] = $row;
     }
 
-    // Libera los recursos
+    // Liberar recursos
     oci_free_statement($stid);
     oci_free_statement($cursor);
     oci_close($conn);

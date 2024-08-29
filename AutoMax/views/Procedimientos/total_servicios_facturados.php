@@ -11,16 +11,17 @@ if (!$conn) {
 $sql = 'BEGIN total_servicios_facturados; END;';
 $stid = oci_parse($conn, $sql);
 
-// Ejecutar la consulta y verificar errores
+// Ejecutar el bloque PL/SQL y verificar errores
 if (!oci_execute($stid)) {
     $e = oci_error($stid);
     echo "<p>Error al ejecutar la consulta: " . htmlentities($e['message'], ENT_QUOTES) . "</p>";
 } else {
-    // Aquí se puede manejar la salida, pero dado que el procedimiento imprime directamente
-    // el resultado con DBMS_OUTPUT.PUT_LINE, no es necesario capturar nada más en PHP.
+    // Aquí asumimos que el procedimiento realiza una acción que no requiere resultado en PHP
+    // Si el procedimiento tiene salida directa con DBMS_OUTPUT.PUT_LINE, se ignora aquí.
     echo "<p>Consulta ejecutada exitosamente.</p>";
 }
 
+// Liberar recursos
 oci_free_statement($stid);
 oci_close($conn);
 ?>

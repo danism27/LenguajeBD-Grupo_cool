@@ -1,7 +1,7 @@
 <?php
 // Verificar si se ha proporcionado un ID en la URL
-if (isset($_GET['id'])) {
-    $id_vehiculo = $_GET['id'];
+if (isset($_GET['id_vehiculo'])) {
+    $id_vehiculo = $_GET['id_vehiculo'];
 
     // Conectar a la base de datos
     $conn = oci_connect('AutoMax', '123', 'localhost/ORCL');
@@ -14,6 +14,11 @@ if (isset($_GET['id'])) {
     // Obtener los datos actuales del vehículo
     $sql = 'BEGIN get_vehiculo(:id_vehiculo, :num_placa, :tipo_vehiculo, :estado_vehiculo, :marca, :modelo, :fecha_registro, :nombre_usuario); END;';
     $stid = oci_parse($conn, $sql);
+    
+    // Variables para recibir los datos del procedimiento
+    $num_placa = $tipo_vehiculo = $estado_vehiculo = $marca = $modelo = $fecha_registro = $nombre_usuario = null;
+
+    // Bind variables
     oci_bind_by_name($stid, ':id_vehiculo', $id_vehiculo);
     oci_bind_by_name($stid, ':num_placa', $num_placa, 100);
     oci_bind_by_name($stid, ':tipo_vehiculo', $tipo_vehiculo, 100);
@@ -22,34 +27,25 @@ if (isset($_GET['id'])) {
     oci_bind_by_name($stid, ':modelo', $modelo, 100);
     oci_bind_by_name($stid, ':fecha_registro', $fecha_registro, 50);
     oci_bind_by_name($stid, ':nombre_usuario', $nombre_usuario, 100);
-    oci_execute($stid);
+    
+    // Ejecutar el procedimiento
+    if (!oci_execute($stid)) {
+        $e = oci_error($stid);
+        echo "<p>Error al ejecutar el procedimiento: " . htmlentities($e['message'], ENT_QUOTES) . "</p>";
+        oci_free_statement($stid);
+        oci_close($conn);
+        exit;
+    }
+    
     oci_free_statement($stid);
 
-    // Llamar al procedimiento mostrar_oficinas y capturar la salida
-    $sql_oficinas = 'BEGIN mostrar_oficinas; END;';
-    $stid_oficinas = oci_parse($conn, $sql_oficinas);
-    oci_execute($stid_oficinas);
+    // Llamar al procedimiento mostrar_oficinas (parece que no se utiliza, así que lo eliminaremos)
+    // $sql_oficinas = 'BEGIN mostrar_oficinas; END;';
+    // $stid_oficinas = oci_parse($conn, $sql_oficinas);
+    // oci_execute($stid_oficinas);
+    // oci_free_statement($stid_oficinas);
 
-    // Obtener la salida de DBMS_OUTPUT
-    $output = "";
-    $sql_output = "DECLARE
-                      line VARCHAR2(255);
-                      status INTEGER;
-                   BEGIN
-                      LOOP
-                          DBMS_OUTPUT.GET_LINE(line, status);
-                          EXIT WHEN status = 1;
-                          :output := :output || line || CHR(10);
-                      END LOOP;
-                   END;";
-    $stid_output = oci_parse($conn, $sql_output);
-    oci_bind_by_name($stid_output, ':output', $output, 4000);
-    oci_execute($stid_output);
-    oci_free_statement($stid_output);
-
-    echo "<pre>$output</pre>";
-
-    oci_free_statement($stid_oficinas);
+    // Liberar recursos y cerrar la conexión
     oci_close($conn);
 } else {
     echo "<p>No se proporcionó un ID de vehículo en la URL.</p>";
@@ -163,7 +159,7 @@ if (isset($_GET['id'])) {
                 <div class="col-md-4">
                     <h3 class="display-5">Redes Sociales</h3>
                     <p><i class="fa fa-facebook" aria-hidden="true"></i> Autos Max</p>
-                    <p><i class "fa fa-instagram" aria-hidden="true"></i> Autos Max</p>
+                    <p><i class="fa fa-instagram" aria-hidden="true"></i> Autos Max</p>
                     <p><i class="fa fa-twitter" aria-hidden="true"></i> Autos Max</p>
                 </div>
                 <div class="col-md-4">
@@ -175,4 +171,5 @@ if (isset($_GET['id'])) {
         </div>
     </div>
 </footer>
+
 </html>

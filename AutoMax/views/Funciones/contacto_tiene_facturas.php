@@ -18,7 +18,7 @@ if (isset($_GET['id'])) {
     // Bind variables
     $resultado = null;
     oci_bind_by_name($stid, ':id_contacto', $id_contacto);
-    oci_bind_by_name($stid, ':resultado', $resultado, 100);
+    oci_bind_by_name($stid, ':resultado', $resultado, 100); // Adjust size if necessary
     
     // Ejecutar el bloque PL/SQL
     oci_execute($stid);

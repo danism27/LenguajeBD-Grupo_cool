@@ -16,7 +16,7 @@ if (isset($_GET['cargo'])) {
     $stid = oci_parse($conn, $sql);
     
     // Bind variables
-    $cursor = null;
+    $cursor = oci_new_cursor($conn);
     oci_bind_by_name($stid, ':cargo', $cargo);
     oci_bind_by_name($stid, ':cursor', $cursor, -1, OCI_B_CURSOR);
     
@@ -24,7 +24,6 @@ if (isset($_GET['cargo'])) {
     oci_execute($stid);
     
     // Abrir y obtener datos del cursor
-    $cursor = oci_new_cursor($conn);
     oci_execute($cursor);
     
     // Fetch all rows from the cursor
@@ -111,6 +110,8 @@ if (isset($_GET['cargo'])) {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 </body>
+
+</html>
 
 <footer>
     <div class="footer bg-dark mt-5 p-5 text-center navbar-dark" style="color: white; background-color: #000000;">

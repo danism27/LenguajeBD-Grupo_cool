@@ -1,7 +1,7 @@
 <?php
-// Verificar si se ha proporcionado un ID de factura en la URL
+// Verificar si se ha proporcionado un código de repuesto en la URL
 if (isset($_GET['id'])) {
-    $id_factura = $_GET['id'];
+    $cod_repuesto = $_GET['id'];
 
     // Conectar a la base de datos
     $conn = oci_connect('AutoMax', '123', 'localhost/ORCL');
@@ -11,13 +11,13 @@ if (isset($_GET['id'])) {
         exit;
     }
 
-    // Preparar y ejecutar el bloque PL/SQL para listar repuestos
-    $sql = 'BEGIN :cursor := listar_repuestos_factura(:id_factura); END;';
+    // Preparar y ejecutar el bloque PL/SQL para obtener los detalles del repuesto
+    $sql = 'BEGIN :cursor := listar_repuestos(:cod_repuesto); END;';
     $stid = oci_parse($conn, $sql);
     
     // Bind variables
     $cursor = oci_new_cursor($conn);
-    oci_bind_by_name($stid, ':id_factura', $id_factura);
+    oci_bind_by_name($stid, ':cod_repuesto', $cod_repuesto);
     oci_bind_by_name($stid, ':cursor', $cursor, -1, OCI_B_CURSOR);
     
     // Ejecutar el bloque PL/SQL
@@ -35,7 +35,7 @@ if (isset($_GET['id'])) {
     oci_free_statement($cursor);
     oci_close($conn);
 } else {
-    echo "<p>No se proporcionó un ID de factura en la URL.</p>";
+    echo "<p>No se proporcionó un código de repuesto en la URL.</p>";
     exit();
 }
 ?>
@@ -44,7 +44,7 @@ if (isset($_GET['id'])) {
 <html lang="es">
 
 <head>
-    <title>Repuestos de la Factura</title>
+    <title>Detalles del Repuesto</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="main.css">
@@ -75,13 +75,14 @@ if (isset($_GET['id'])) {
     <br><br><br><br><br>
 
     <div class="container">
-        <h1 class="text-center">Repuestos de la Factura</h1>
+        <h1 class="text-center">Detalles del Repuesto</h1>
         <?php if (!empty($repuestos)) : ?>
             <table class="table table-striped">
                 <thead>
                     <tr>
                         <th>Nombre del Repuesto</th>
-                        <th>Cantidad</th>
+                        <th>Fecha de Registro</th>
+                        <th>Nombre del Usuario</th>
                         <th>Precio del Repuesto</th>
                     </tr>
                 </thead>
@@ -89,14 +90,15 @@ if (isset($_GET['id'])) {
                     <?php foreach ($repuestos as $repuesto) : ?>
                         <tr>
                             <td><?php echo htmlentities($repuesto['NOMBRE_REPUESTO'], ENT_QUOTES); ?></td>
-                            <td><?php echo htmlentities($repuesto['CANTIDAD'], ENT_QUOTES); ?></td>
-                            <td><?php echo htmlentities($repuesto['PRECIO_REPUESTO'], ENT_QUOTES); ?></td>
+                            <td><?php echo htmlentities(date('d/m/Y', strtotime($repuesto['FECHA_REGISTRO'])), ENT_QUOTES); ?></td>
+                            <td><?php echo htmlentities($repuesto['NOMBRE_USUARIO'], ENT_QUOTES); ?></td>
+                            <td><?php echo htmlentities(number_format($repuesto['PRECIO_REPUESTO'], 2), ENT_QUOTES); ?></td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
             </table>
         <?php else : ?>
-            <p class="text-center">No se encontraron repuestos para la factura proporcionada.</p>
+            <p class="text-center">No se encontraron repuestos para el código proporcionado.</p>
         <?php endif; ?>
         <br>
         <a class="btn btn-secondary" href="index.php">Volver</a>
