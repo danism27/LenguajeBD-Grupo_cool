@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <title>Actualizar Empleado - Paso 1</title>
+    <title>Contar Empleados</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="main.css">
@@ -73,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <!-- Botones para Crear y Leer -->
             <div class="mb-3 d-flex justify-content-center align-items-center">
                 <!-- Mini Formulario para Leer Oficina Específica -->
-                <form action="leer_oficina.php" method="GET" class="form-inline d-flex mr-3">
+                <form method="POST" class="form-inline d-flex mr-3">
                     <label for="id_oficina" class="mr-2">Buscar Oficina por ID:</label>
                     <input type="number" id="id_oficina" name="id_oficina" class="form-control mr-2" required>
                     <button type="submit" class="btn btn-primary">Leer</button>
@@ -112,7 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         
 
             <br><br>
-            <button type="submit" class="btn btn-primary">Actualizar</button>
+            <button type="submit" class="btn btn-primary">Contar</button>
             <a class="btn btn-secondary" href="Tabla_Empleados.php">Volver</a>
         </form>
     </div>
