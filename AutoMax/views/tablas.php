@@ -85,7 +85,7 @@
         <div class="list-group">
         <a href="Funciones/calcular_total_factura.php" class="list-group-item list-group-item-action">Calcular el Total de la Factura</a>
         <a href="Funciones/contacto_tiene_facturas.php" class="list-group-item list-group-item-action">Facturas por Contacto</a>
-        <a href="Funciones/listar_contactos_tipo.php" class="list-group-item list-group-item-action">Lista de Contactos por tipo</a>
+        <a href="Funciones/listar_contactos_por_tipo.php" class="list-group-item list-group-item-action">Lista de Contactos por tipo</a>
         <a href="Funciones/listar_empleados_por_cargo.php" class="list-group-item list-group-item-action">Lista de Empleados por cargo</a>
         <a href="Funciones/listar_facturas_por_fecha.php" class="list-group-item list-group-item-action">Lista de Facturas por fecha</a>
         <a href="Funciones/listar_repuestos_por_factura.php" class="list-group-item list-group-item-action">Lista de repuestos por factura</a>
