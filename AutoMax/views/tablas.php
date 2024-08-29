@@ -50,6 +50,20 @@
                 Empleados</a>
         </div>
     </div>
+
+    <div class="container pt-4">
+        <h1 class="text-center">Menú de Paquetes</h1>
+        <div class="list-group">
+            <a href="Paquetes/PaqueteDetalleFactura.php" class="list-group-item list-group-item-action">DetalleFactura</a>
+            <a href="Paquetes/ObtenerFacturaspkg.php" class="list-group-item list-group-item-action">Paquete Obtener Facturas</a>
+            <a href="Paquetes/ObtenerFacturaspkg.php" class="list-group-item list-group-item-action">Paquete Obtener Facturas</a>
+            <a href="Paquetes/PaqueteServicios_Empleado.php" class="list-group-item list-group-item-action">Paquete Servicios Empleados</a>
+            <a href="Paquetes/PaqueteVehiculos.php" class="list-group-item list-group-item-action">Paquete Vehiculos Activos</a>
+            <a href="Paquetes/PaqueteRespuestos.php" class="list-group-item list-group-item-action">Paquete Respuestos</a>
+            <a href="Paquetes/ObtenerClientespkg.php" class="list-group-item list-group-item-action">Paquete Obtener Clientes</a>
+        </div>
+    </div>
+
 </body>
 
 <footer>

@@ -16,7 +16,8 @@ function Conecta()
         $conexion->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         //echo "Conexión establecida con éxito."; 
     } catch (PDOException $e) {
-        echo "Ocurrió un problema al establecer la conexión: " . $e->getMessage();
+        error_log("Ocurrió un problema al establecer la conexión: " . $e->getMessage());
+        echo "Ocurrió un problema al establecer la conexión. Por favor, contacte al administrador.";
     }
  
     return $conexion;
