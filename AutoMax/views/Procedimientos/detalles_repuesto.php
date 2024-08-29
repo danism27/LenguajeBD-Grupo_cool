@@ -1,7 +1,7 @@
 <?php
 // Verificar si se ha proporcionado un código de repuesto en la URL
-if (isset($_GET['id'])) {
-    $cod_repuesto = $_GET['id'];
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $cod_repuesto = $_POST['id_repuesto'];
 
     // Conectar a la base de datos
     $conn = oci_connect('AutoMax', '123', 'localhost/ORCL');
@@ -24,10 +24,7 @@ if (isset($_GET['id'])) {
     oci_free_statement($stid);
 
     oci_close($conn);
-} else {
-    echo "<p>No se proporcionó un código de repuesto en la URL.</p>";
-    exit();
-}
+} 
 ?>
 
 <!DOCTYPE html>
@@ -62,10 +59,19 @@ if (isset($_GET['id'])) {
             </div>
         </nav>
     </header>
-    <br><br><br><br><br>
+
+<!-- Botones para Mostrar detalles de los repuestos -->
+<div class="mb-3 d-flex justify-content-center align-items-center">
+    <!-- Mini Formulario para Contar -->
+    <form method="POST" class="form-inline d-flex mr-3">
+        <label for="id_empleado" class="mr-2">Mostrar detalles de los Repuestos:</label>
+        <button type="submit" class="btn btn-primary">Mostrar</button>
+    </form>
+</div>
+
 
     <div class="container">
-        <h1 class="text-center">Detalles del Repuesto</h1>
+        <h1 class="text-center">Detalles de los Repuesto</h1>
         <!-- Mostrar los datos del repuesto -->
         <p><strong>Nombre del Repuesto:</strong> <?php echo htmlentities($nombre_repuesto, ENT_QUOTES); ?></p>
         <p><strong>Fecha de Registro:</strong> <?php echo htmlentities(date('d/m/Y', strtotime($fecha_registro)), ENT_QUOTES); ?></p>
