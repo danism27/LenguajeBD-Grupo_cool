@@ -74,48 +74,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <div class="mb-3 d-flex justify-content-center align-items-center">
                 <!-- Mini Formulario para Leer Oficina Específica -->
                 <form method="POST" class="form-inline d-flex mr-3">
-                    <label for="id_oficina" class="mr-2">Buscar Oficina por ID:</label>
+                    <label for="id_oficina" class="mr-2">Contar Empleados por Oficina:</label>
                     <input type="number" id="id_oficina" name="id_oficina" class="form-control mr-2" required>
-                    <button type="submit" class="btn btn-primary">Leer</button>
+                    <button type="submit" class="btn btn-primary">Contar</button>
                 </form>
             </div>
-
-            <div class="form-group">
-                <label for="nombre_empleado">Nombre del Empleado:</label>
-                <input type="text" class="form-control" id="nombre_empleado" name="nombre_empleado"
-                    value="<?php echo htmlentities($nombre_empleado, ENT_QUOTES); ?>" required>
-            </div>
-
-            <div class="form-group">
-                <label for="apellido_empleado">Apellido del Empleado:</label>
-                <input type="text" class="form-control" id="apellido_empleado" name="apellido_empleado"
-                    value="<?php echo htmlentities($apellido_empleado, ENT_QUOTES); ?>" required>
-            </div>
-
-            <div class="form-group">
-                <label for="cargo_empleado">Cargo del Empleado:</label>
-                <input type="text" class="form-control" id="cargo_empleado" name="cargo_empleado"
-                    value="<?php echo htmlentities($cargo_empleado, ENT_QUOTES); ?>" required>
-            </div>
-
-            <div class="form-group">
-                <label for="fecha_contratacion">Fecha de Contratación:</label>
-                <input type="text" class="form-control" id="fecha_contratacion" name="fecha_contratacion"
-                    value="<?php echo htmlentities($fecha_contratacion, ENT_QUOTES); ?>" required>
-            </div>
-
-            <div class="form-group">
-                <label for="salario">Salario:</label>
-                <input type="text" class="form-control" id="salario" name="salario"
-                    value="<?php echo htmlentities($salario, ENT_QUOTES); ?>" required>
-            </div>
-        
-
-            <br><br>
-            <button type="submit" class="btn btn-primary">Contar</button>
-            <a class="btn btn-secondary" href="Tabla_Empleados.php">Volver</a>
-        </form>
-    </div>
 
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
