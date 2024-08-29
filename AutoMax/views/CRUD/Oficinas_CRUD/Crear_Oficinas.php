@@ -66,7 +66,7 @@
                 </ul>
             </div>
         </nav>
-        </heade>
+        </header>
         <br><br><br><br><br>
         <div class="container">
             <h1 class="text-center">Crear Nueva Oficina</h1>
