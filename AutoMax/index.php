@@ -41,6 +41,9 @@
 					<li class="nav-item">
 						<a class="nav-link" href="views/tablas.php">Vistas</a>
 					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="views/tablas.php">Triggers</a>
+					</li>
 				</ul>
 			</div>
 		</nav>

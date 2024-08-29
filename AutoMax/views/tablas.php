@@ -96,6 +96,17 @@
         </div>
     </div>
 
+    <div class="container">
+        <h1 class="text-center">Menú de Triggers</h1>
+        <div class="list-group">
+        <a href="Triggers/trigger_revisar_salario.php" class="list-group-item list-group-item-action">Salario de los Empleados</a>
+        <a href="Triggers/trigger_actualizar_repuestos.php" class="list-group-item list-group-item-action">Actualizar Precio de un Repuesto</a>
+        <a href="Triggers/trigger_auditar_eliminaciones.php" class="list-group-item list-group-item-action">Auditar Eliminaciones en Facturas</a>
+        <a href="Triggers/trigger_auditar_inserciones.php" class="list-group-item list-group-item-action">Auditar Inserciones en Vehiculos</a>
+        <a href="Triggers/trigger_auditar_contactos.php" class="list-group-item list-group-item-action">Auditar Inserciones en Contactos</a>
+        </div>
+    </div>
+
 </body>
 
 <footer>
