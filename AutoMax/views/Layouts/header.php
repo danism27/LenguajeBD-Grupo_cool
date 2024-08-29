@@ -11,7 +11,7 @@
                     <a class="nav-link" href="../index.php">Inicio</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="../views/tablas.php">Ver talbas</a>
+                    <a class="nav-link" href="../views/tablas.php">Ver tablas</a>
                 </li>
             </ul>
         </div>
