@@ -25,15 +25,16 @@
         <div class="list-group">
             <a href="CRUD/Oficinas_CRUD/Tabla_Oficinas.php" class="list-group-item list-group-item-action">Oficinas</a>
             <a href="CRUD/Vehiculos_CRUD/Tabla_Vehiculo.php" class="list-group-item list-group-item-action">Vehículos</a>
-            <a href="vehiculos.php" class="list-group-item list-group-item-action">Contactos    ❎</a>
-            <a href="ordenes.php" class="list-group-item list-group-item-action">Facturas    ❎</a>
-            <a href="servicios.php" class="list-group-item list-group-item-action">Detalles Facturas    ❎</a>
-            <a href="ordenes.php" class="list-group-item list-group-item-action">Repuestos    ❎</a>
-            <a href="clientes.php" class="list-group-item list-group-item-action">Servicios  ❎</a>
-            <a href="clientes.php" class="list-group-item list-group-item-action">Empleados  ❎</a>
-
+            <a href="CRUD/Empleados_CRUD/Tabla_Empleados.php" class="list-group-item list-group-item-action">Empleados</a>
+            <a href="CRUD/Facturas_CRUD/Tabla_Facturas.php" class="list-group-item list-group-item-action">Facturas</a>
+            <a href="CRUD/Detalles_Facturas_CRUD/Tabla_Detalle_factura.php" class="list-group-item list-group-item-action">Detalles Facturas</a>
+            <a href="CRUD/Repuestos_CRUD/Tabla_Repuesto.php" class="list-group-item list-group-item-action">Repuestos</a>
+            <a href="CRUD/Contactos_CRUD/Tabla_Contacto.php" class="list-group-item list-group-item-action">Contactos</a>
+            <a href="CRUD/Servicios_CRUD/Tabla_Servicio.php" class="list-group-item list-group-item-action">Servicios</a>
         </div>
     </div>
+
+
     <br><br>
 
     <div class="container">
