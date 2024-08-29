@@ -1113,24 +1113,23 @@ END;
 SELECT * FROM VEHICULOS;
 
 ------------------------    ELIMINAR   ---------------------------------------
-CREATE OR REPLACE PROCEDURE delete_vehiculo (
-    p_id_vehiculo IN VEHICULOS.ID_VEHICULO%TYPE
-) AS
+CREATE OR REPLACE PROCEDURE DELETE_VEHICULO(p_id_vehiculo IN NUMBER) IS
 BEGIN
-    DELETE FROM VEHICULOS
-    WHERE ID_VEHICULO = p_id_vehiculo;
+    DELETE FROM VEHICULOS WHERE ID_VEHICULO = p_id_vehiculo;
     
-    DBMS_OUTPUT.PUT_LINE('Vehículo eliminado correctamente:');
-    DBMS_OUTPUT.PUT_LINE('ID Vehículo: ' || p_id_vehiculo);
+    IF SQL%ROWCOUNT = 0 THEN
+        RAISE_APPLICATION_ERROR(-20001, 'No se encontró ningún vehículo con el ID proporcionado.');
+    END IF;
+    
+    COMMIT;
 END;
+
 
 -- Usar procedure
 BEGIN
-    delete_vehiculo(
-        p_id_vehiculo => 21  -- Reemplaza con un ID_VEHICULO existente
-    );
+    DELETE_VEHICULO(1); -- Poner aquí el ID del vehículo que deseas eliminar
 END;
-/
+
 
 SELECT * FROM VEHICULOS;
 
