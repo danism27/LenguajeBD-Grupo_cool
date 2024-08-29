@@ -1,48 +1,53 @@
 <?php
-// Verificar si se ha proporcionado un ID en la URL
-if (isset($_GET['id'])) {
-    $id_oficina = $_GET['id'];
+// Conectar a la base de datos
+$conn = oci_connect('AutoMax', '123', 'localhost/ORCL');
+if (!$conn) {
+    $e = oci_error();
+    echo "<p>Error al conectar a la base de datos: " . htmlentities($e['message'], ENT_QUOTES) . "</p>";
+    exit;
+}
 
-    // Conectar a la base de datos
-    $conn = oci_connect('AutoMax', '123', 'localhost/ORCL');
-    if (!$conn) {
-        $e = oci_error();
-        echo "<p>Error al conectar a la base de datos: " . htmlentities($e['message'], ENT_QUOTES) . "</p>";
-        exit;
-    }
+// Verificar si se ha enviado el formulario
+if (isset($_POST['id_oficina'])) {
+    $id_oficina = $_POST['id_oficina'];
 
     // Preparar y ejecutar el bloque PL/SQL para obtener la información de la oficina
-    $sql = 'BEGIN :info_oficina := obtener_informacion_oficina(:id_oficina); END;';
+    $sql = 'BEGIN obtener_informacion_oficina(:id_oficina, :info_oficina); END;';
     $stid = oci_parse($conn, $sql);
-    
+
     // Crear un cursor
     $cursor = oci_new_cursor($conn);
-    oci_bind_by_name($stid, ':id_oficina', $id_oficina);
+    oci_bind_by_name($stid, ':id_oficina', $id_oficina, -1, SQLT_INT);
     oci_bind_by_name($stid, ':info_oficina', $cursor, -1, OCI_B_CURSOR);
-    
+
     // Ejecutar el bloque PL/SQL
-    if (!oci_execute($stid)) {
+    if (oci_execute($stid)) {
+        // Ejecutar el cursor
+        if (oci_execute($cursor)) {
+            $info_oficina = oci_fetch_assoc($cursor);
+        } else {
+            $e = oci_error($cursor);
+            echo "<p>Error al ejecutar el cursor: " . htmlentities($e['message'], ENT_QUOTES) . "</p>";
+            $info_oficina = null;
+        }
+    } else {
         $e = oci_error($stid);
         echo "<p>Error al ejecutar el bloque PL/SQL: " . htmlentities($e['message'], ENT_QUOTES) . "</p>";
-        oci_free_statement($stid);
-        oci_close($conn);
-        exit;
+        $info_oficina = null;
     }
-
-    // Ejecutar el cursor
-    oci_execute($cursor);
-
-    // Obtener la información de la oficina
-    $info_oficina = oci_fetch_assoc($cursor);
 
     // Liberar recursos
     oci_free_statement($stid);
     oci_free_statement($cursor);
-    oci_close($conn);
 } else {
-    echo "<p>No se proporcionó un ID de oficina en la URL.</p>";
-    exit();
+    $info_oficina = null;
 }
+
+// Consultar todas las oficinas para el select
+$sql_oficinas = 'SELECT ID_OFICINA, NOMBRE_OFICINA FROM OFICINAS ORDER BY NOMBRE_OFICINA';
+$stid_oficinas = oci_parse($conn, $sql_oficinas);
+oci_execute($stid_oficinas);
+
 ?>
 
 <!DOCTYPE html>
@@ -81,20 +86,31 @@ if (isset($_GET['id'])) {
 
     <div class="container">
         <h1 class="text-center">Detalles de la Oficina</h1>
-        
+
+        <!-- Formulario para seleccionar la oficina -->
+        <form method="post" class="text-center mb-4">
+            <label for="id_oficina">Seleccione una oficina:</label>
+            <select name="id_oficina" id="id_oficina" class="form-control d-inline-block w-50">
+                <?php while ($row = oci_fetch_assoc($stid_oficinas)) : ?>
+                    <option value="<?php echo htmlentities($row['ID_OFICINA'], ENT_QUOTES); ?>">
+                        <?php echo htmlentities($row['NOMBRE_OFICINA'], ENT_QUOTES); ?>
+                    </option>
+                <?php endwhile; ?>
+            </select>
+            <button type="submit" class="btn btn-primary mt-3">Ver detalles</button>
+        </form>
+
         <?php if ($info_oficina) : ?>
             <div class="alert alert-info">
                 <h4>Información de la Oficina:</h4>
-                <p><strong>ID Oficina:</strong> <?php echo htmlentities($info_oficina['ID_OFICINA'], ENT_QUOTES); ?></p>
-                <p><strong>Nombre Oficina:</strong> <?php echo htmlentities($info_oficina['NOMBRE_OFICINA'], ENT_QUOTES); ?></p>
-                <p><strong>Fecha de Registro:</strong> <?php echo htmlentities(date('d/m/Y', strtotime($info_oficina['FECHA_REGISTRO'])), ENT_QUOTES); ?></p>
+                <p><strong>Detalles:</strong> <?php echo htmlentities($info_oficina['INFO_OFICINA'], ENT_QUOTES); ?></p>
             </div>
-        <?php else : ?>
-            <p class="text-center">No se encontró información para la oficina con ID proporcionado.</p>
+        <?php elseif (isset($id_oficina)) : ?>
+            <p class="text-center">No se encontró información para la oficina seleccionada.</p>
         <?php endif; ?>
-        
+
         <br>
-        <a class="btn btn-secondary" href="index.php">Volver</a>
+        <a class="btn btn-secondary" href="/LenguajeBD-Grupo_cool/AutoMax/views/tablas.php">Volver</a>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
@@ -114,13 +130,14 @@ if (isset($_GET['id'])) {
                 <div class="col-md-4">
                     <h3 class="display-5">Redes Sociales</h3>
                     <p><i class="fa fa-facebook" aria-hidden="true"></i> Autos Max</p>
-                    <p><i class="fa fa-instagram" aria-hidden="true"></i> Autos Max</p>
-                    <p><i class="fa fa-twitter" aria-hidden="true"></i> Autos Max</p>
+                    <p><i class="fa fa-instagram" aria-hidden="true"></i> @autos_max</p>
+                    <p><i class="fa fa-twitter" aria-hidden="true"></i> @autos_max</p>
                 </div>
                 <div class="col-md-4">
-                    <h3 class="display-5">Contáctanos</h3>
-                    <p><i class="fa fa-phone" aria-hidden="true"></i> Teléfono: 809-555-5555</p>
-                    <p><i class="fa fa-exclamation-circle" aria-hidden="true"></i> Correo: AutosMax@Ufide.ac.cr</p>
+                    <h3 class="display-5">Contáctenos</h3>
+                    <p><i class="fa fa-phone" aria-hidden="true"></i> +1 (800) 555-5555</p>
+                    <p><i class="fa fa-envelope" aria-hidden="true"></i> info@autosmax.com</p>
+                    <p><i class="fa fa-map-marker" aria-hidden="true"></i> 123 Calle Principal, Ciudad, País</p>
                 </div>
             </div>
         </div>

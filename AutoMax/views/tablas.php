@@ -92,7 +92,6 @@
         <a href="Funciones/obtener_descripcion_servicio.php" class="list-group-item list-group-item-action">Descripcion del Servicio</a>
         <a href="Funciones/obtener_fecha_contratacion.php" class="list-group-item list-group-item-action">Fecha de Contratacion</a>
         <a href="Funciones/obtener_informacion_oficina.php" class="list-group-item list-group-item-action">Informacion de Oficina</a>
-        <a href="Funciones/obtener_nombre_contacto.php" class="list-group-item list-group-item-action">Nombre de Contacto</a>
         </div>
     </div>
 

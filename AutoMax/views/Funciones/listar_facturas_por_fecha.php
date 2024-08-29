@@ -121,7 +121,7 @@ if (isset($_POST['fecha_inicio']) && isset($_POST['fecha_fin'])) {
         <?php endif; ?>
 
         <br>
-        <a class="btn btn-secondary" href="/LenguajeBD-Grupo_cool3/AutoMax/views/tablas.php">Volver</a>
+        <a class="btn btn-secondary" href="/LenguajeBD-Grupo_cool/AutoMax/views/tablas.php">Volver</a>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
