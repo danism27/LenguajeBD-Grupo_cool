@@ -143,7 +143,7 @@ oci_close($conn);
         <?php endif; ?>
         
         <br>
-        <a class="btn btn-secondary" href="index.php">Volver</a>
+        <a class="btn btn-secondary" href="/LenguajeBD-Grupo_cool3/AutoMax/views/tablas.php">Volver</a>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
