@@ -1,22 +1,25 @@
 <?php
-// Verificar si se ha proporcionado un código de servicio en la URL
-if (isset($_GET['cod_servicio'])) {
-    $cod_servicio = $_GET['cod_servicio'];
+// Conectar a la base de datos
+$conn = oci_connect('AutoMax', '123', 'localhost/ORCL');
+if (!$conn) {
+    $e = oci_error();
+    echo "<p>Error al conectar a la base de datos: " . htmlentities($e['message'], ENT_QUOTES) . "</p>";
+    exit;
+}
 
-    // Conectar a la base de datos
-    $conn = oci_connect('AutoMax', '123', 'localhost/ORCL');
-    if (!$conn) {
-        $e = oci_error();
-        echo "<p>Error al conectar a la base de datos: " . htmlentities($e['message'], ENT_QUOTES) . "</p>";
-        exit;
-    }
+// Inicializar variables
+$cod_servicio = null;
+$descripcion = null;
+
+// Verificar si se ha enviado el formulario
+if (isset($_POST['submit'])) {
+    $cod_servicio = $_POST['cod_servicio'];
 
     // Preparar y ejecutar el bloque PL/SQL para obtener la descripción del servicio
     $sql = 'BEGIN :descripcion := obtener_descripcion_servicio(:cod_servicio); END;';
     $stid = oci_parse($conn, $sql);
     
     // Bind variables
-    $descripcion = null;
     oci_bind_by_name($stid, ':cod_servicio', $cod_servicio);
     oci_bind_by_name($stid, ':descripcion', $descripcion, 1000);  // Ajusta el tamaño según sea necesario
     
@@ -28,14 +31,15 @@ if (isset($_GET['cod_servicio'])) {
         oci_close($conn);
         exit;
     }
-    
-    // Libera los recursos
+
+    // Liberar recursos
     oci_free_statement($stid);
-    oci_close($conn);
-} else {
-    echo "<p>No se proporcionó un código de servicio en la URL.</p>";
-    exit();
 }
+
+// Obtener la lista de servicios para el formulario
+$sql = 'SELECT COD_SERVICIO, NOMBRE_SERVICIO FROM SERVICIOS ORDER BY NOMBRE_SERVICIO';
+$stid = oci_parse($conn, $sql);
+oci_execute($stid);
 ?>
 
 <!DOCTYPE html>
@@ -74,14 +78,36 @@ if (isset($_GET['cod_servicio'])) {
 
     <div class="container">
         <h1 class="text-center">Descripción del Servicio</h1>
-        
-        <div class="alert alert-info">
-            <h4>Descripción:</h4>
-            <p><?php echo htmlentities($descripcion, ENT_QUOTES); ?></p>
-        </div>
-        
+
+        <!-- Formulario para seleccionar un servicio -->
+        <form method="post" action="">
+            <div class="mb-3">
+                <label for="cod_servicio" class="form-label">Selecciona el Servicio:</label>
+                <select id="cod_servicio" name="cod_servicio" class="form-select" required>
+                    <option value="">Seleccione un servicio</option>
+                    <?php while ($row = oci_fetch_assoc($stid)) : ?>
+                        <option value="<?php echo htmlentities($row['COD_SERVICIO'], ENT_QUOTES); ?>">
+                            <?php echo htmlentities($row['NOMBRE_SERVICIO'], ENT_QUOTES); ?>
+                        </option>
+                    <?php endwhile; ?>
+                </select>
+            </div>
+            <button type="submit" name="submit" class="btn btn-primary">Obtener Descripción</button>
+        </form>
+
+        <!-- Mostrar la descripción si se ha seleccionado un servicio -->
+        <?php if ($descripcion !== null) : ?>
+            <br>
+            <div class="alert alert-info">
+                <h4>Descripción:</h4>
+                <p><?php echo htmlentities($descripcion, ENT_QUOTES); ?></p>
+            </div>
+        <?php elseif ($cod_servicio !== null) : ?>
+            <p class="text-center">No se encontró descripción para el servicio seleccionado.</p>
+        <?php endif; ?>
+
         <br>
-        <a class="btn btn-secondary" href="index.php">Volver</a>
+        <a class="btn btn-secondary" href="/LenguajeBD-Grupo_cool3/AutoMax/views/tablas.php">Volver</a>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
@@ -89,4 +115,24 @@ if (isset($_GET['cod_servicio'])) {
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 </body>
 
-</html>
+<footer>
+    <div class="footer bg-dark mt-5 p-5 text-center navbar-dark" style="color: white; background-color: #000000;">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h3 class="display-5">Autos Max</h3>
+                    <p class="mt-3">Autos Fidelitas es una empresa dedicada a la venta de autos nuevos y usados,
+                        alquiler de autos y venta de repuestos.</p>
+                </div>
+                <div class="col-md-4">
+                    <h3 class="display-5">Redes Sociales</h3>
+                    <p><i class="fa fa-facebook" aria-hidden="true"></i> Autos Max</p>
+                    <p><i class="fa fa-instagram" aria-hidden="true"></i> Autos Max</p>
+                    <p><i class="fa fa-twitter" aria-hidden="true"></i> Autos Max</p>
+                </div>
+                <div class="col-md-4">
+                    <h3 class="display-5">Contáctanos</h3>
+                    <p><i class="fa fa-phone" aria-hidden="true"></i> Teléfono: 809-555-5555</p>
+                    <p><i class="fa fa-exclamation-circle" aria-hidden="true"></i> Correo: AutosMax@Ufide.ac.cr</p>
+                </div>
+            </div>

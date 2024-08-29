@@ -1,40 +1,43 @@
 <?php
-// Verificar si se ha proporcionado un ID en la URL
-if (isset($_GET['id'])) {
-    $id_empleado = $_GET['id'];
+// Conectar a la base de datos
+$conn = oci_connect('AutoMax', '123', 'localhost/ORCL');
+if (!$conn) {
+    $e = oci_error();
+    echo "<p>Error al conectar a la base de datos: " . htmlentities($e['message'], ENT_QUOTES) . "</p>";
+    exit;
+}
 
-    // Conectar a la base de datos
-    $conn = oci_connect('AutoMax', '123', 'localhost/ORCL');
-    if (!$conn) {
-        $e = oci_error();
-        echo "<p>Error al conectar a la base de datos: " . htmlentities($e['message'], ENT_QUOTES) . "</p>";
-        exit;
-    }
+// Inicializar variables
+$id_empleado = null;
+$empleado = null;
 
-    // Preparar y ejecutar el bloque PL/SQL para obtener detalles del empleado
-    $sql = 'BEGIN :cursor := obtener_detalles_empleado(:id_empleado); END;';
+// Verificar si se ha enviado el formulario
+if (isset($_POST['submit'])) {
+    $id_empleado = $_POST['id_empleado'];
+
+    // Consulta SQL para obtener detalles del empleado
+    $sql = 'SELECT NOMBRE_EMPLEADO, APELLIDO_EMPLEADO, CARGO_EMPLEADO, FECHA_CONTRATACION, SALARIO 
+            FROM EMPLEADOS 
+            WHERE ID_EMPLEADO = :id_empleado';
     $stid = oci_parse($conn, $sql);
     
-    // Bind variables
-    $cursor = oci_new_cursor($conn);
+    // Bind variable
     oci_bind_by_name($stid, ':id_empleado', $id_empleado);
-    oci_bind_by_name($stid, ':cursor', $cursor, -1, OCI_B_CURSOR);
     
-    // Ejecutar el bloque PL/SQL
+    // Ejecutar la consulta
     oci_execute($stid);
-    oci_execute($cursor);
     
-    // Fetch the employee details
-    $empleado = oci_fetch_assoc($cursor);
+    // Obtener los detalles del empleado
+    $empleado = oci_fetch_assoc($stid);
     
-    // Libera los recursos
+    // Liberar el statement
     oci_free_statement($stid);
-    oci_free_statement($cursor);
-    oci_close($conn);
-} else {
-    echo "<p>No se proporcionó un ID de empleado en la URL.</p>";
-    exit();
 }
+
+// Obtener la lista de empleados para el formulario
+$sql = 'SELECT ID_EMPLEADO, NOMBRE_EMPLEADO FROM EMPLEADOS ORDER BY NOMBRE_EMPLEADO';
+$stid = oci_parse($conn, $sql);
+oci_execute($stid);
 ?>
 
 <!DOCTYPE html>
@@ -73,8 +76,27 @@ if (isset($_GET['id'])) {
 
     <div class="container">
         <h1 class="text-center">Detalles del Empleado</h1>
-        
+
+        <!-- Formulario para seleccionar un empleado -->
+        <form method="post" action="">
+            <div class="mb-3">
+                <label for="id_empleado" class="form-label">Selecciona un Empleado:</label>
+                <select id="id_empleado" name="id_empleado" class="form-select" required>
+                    <option value="">Seleccione un empleado</option>
+                    <?php while ($row = oci_fetch_assoc($stid)) : ?>
+                        <option value="<?php echo htmlentities($row['ID_EMPLEADO'], ENT_QUOTES); ?>"
+                            <?php echo ($row['ID_EMPLEADO'] == $id_empleado) ? 'selected' : ''; ?>>
+                            <?php echo htmlentities($row['NOMBRE_EMPLEADO'], ENT_QUOTES); ?>
+                        </option>
+                    <?php endwhile; ?>
+                </select>
+            </div>
+            <button type="submit" name="submit" class="btn btn-primary">Obtener Detalles</button>
+        </form>
+
+        <!-- Mostrar los detalles del empleado si se ha seleccionado uno -->
         <?php if ($empleado) : ?>
+            <br>
             <div class="alert alert-info">
                 <h4>Nombre del Empleado:</h4>
                 <p><?php echo htmlentities($empleado['NOMBRE_EMPLEADO'], ENT_QUOTES); ?></p>
@@ -87,12 +109,12 @@ if (isset($_GET['id'])) {
                 <h4>Salario:</h4>
                 <p><?php echo htmlentities(number_format($empleado['SALARIO'], 2), ENT_QUOTES); ?></p>
             </div>
-        <?php else : ?>
-            <p class="text-center">No se encontraron detalles para el empleado con ID proporcionado.</p>
+        <?php elseif ($id_empleado !== null) : ?>
+            <p class="text-center">No se encontraron detalles para el empleado seleccionado.</p>
         <?php endif; ?>
         
         <br>
-        <a class="btn btn-secondary" href="index.php">Volver</a>
+        <a class="btn btn-secondary" href="tablas.php">Volver</a>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
@@ -126,3 +148,9 @@ if (isset($_GET['id'])) {
 </footer>
 
 </html>
+
+<?php
+// Liberar recursos y cerrar la conexión a la base de datos
+oci_free_statement($stid);
+oci_close($conn);
+?>
