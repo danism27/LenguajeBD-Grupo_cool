@@ -1,7 +1,7 @@
 <?php
 // Verificar si se ha proporcionado un ID en la URL
-if (isset($_GET['id'])) {
-    $id_empleado = $_GET['id'];
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $id_empleado = $_POST['id_empleado'];
 
     // Conectar a la base de datos
     $conn = oci_connect('AutoMax', '123', 'localhost/ORCL');
@@ -34,9 +34,7 @@ if (isset($_GET['id'])) {
     // Liberar el statement y cerrar la conexión
     oci_free_statement($stid);
     oci_close($conn);
-} else {
-    echo "<p>No se proporcionó un ID de empleado en la URL.</p>";
-    exit();
+
 }
 ?>
 
@@ -71,14 +69,16 @@ if (isset($_GET['id'])) {
             </div>
         </nav>
     </header>
-    <br><br><br><br><br>
 
-    <div class="container">
-        <h1 class="text-center">Actualizar Empleado</h1>
-        <!-- Formulario para ver y enviar los datos del empleado -->
-        <form action="Procesar_Actualizar_Empleado.php" method="GET">
-            <!-- Campo oculto para el ID del empleado -->
-            <input type="hidden" name="id_empleado" value="<?php echo htmlentities($id_empleado, ENT_QUOTES); ?>">
+            <!-- Botones para Crear y Leer -->
+            <div class="mb-3 d-flex justify-content-center align-items-center">
+                <!-- Mini Formulario para Leer Oficina Específica -->
+                <form action="leer_oficina.php" method="GET" class="form-inline d-flex mr-3">
+                    <label for="id_oficina" class="mr-2">Buscar Oficina por ID:</label>
+                    <input type="number" id="id_oficina" name="id_oficina" class="form-control mr-2" required>
+                    <button type="submit" class="btn btn-primary">Leer</button>
+                </form>
+            </div>
 
             <div class="form-group">
                 <label for="nombre_empleado">Nombre del Empleado:</label>
@@ -109,6 +109,7 @@ if (isset($_GET['id'])) {
                 <input type="text" class="form-control" id="salario" name="salario"
                     value="<?php echo htmlentities($salario, ENT_QUOTES); ?>" required>
             </div>
+        
 
             <br><br>
             <button type="submit" class="btn btn-primary">Actualizar</button>
