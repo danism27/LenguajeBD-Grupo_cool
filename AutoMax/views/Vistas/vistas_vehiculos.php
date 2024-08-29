@@ -1,49 +1,54 @@
 <?php
-include '../DAL/conexion.php';
-
-// Establecer la conexión
-try {
-    $conexion = Conecta();
-} catch (PDOException $e) {
-    echo "Error de conexión: " . $e->getMessage();
-    exit();
+// Establecer la conexión con Oracle usando oci_connect
+$conn = oci_connect('AutoMax', '123', 'localhost/ORCL');
+if (!$conn) {
+    $e = oci_error();
+    echo "<p>Error al conectar a la base de datos: " . htmlentities($e['message'], ENT_QUOTES) . "</p>";
+    exit;
 }
- 
-// Preparar la consulta para la vista FIDE_PROMOCIONES_ACTIVAS_V
+
+// Preparar la consulta para la vista de vehículos activos
 $query_select_vehiculos_activos = 'SELECT * FROM V_VEHICULOS_ACTIVOS';
-$stmt_select_vehiculos_activos = $conexion->prepare($query_select_vehiculos_activos);
- 
+$stid_select_vehiculos_activos = oci_parse($conn, $query_select_vehiculos_activos);
+
 try {
     // Ejecutar la consulta
-    $stmt_select_vehiculos_activos->execute();
-} catch (PDOException $e) {
-    echo "Error al ejecutar la consulta: " . $e->getMessage();
-    exit();
+    if (!oci_execute($stid_select_vehiculos_activos)) {
+        $e = oci_error($stid_select_vehiculos_activos);
+        echo "<p>Error al ejecutar la consulta: " . htmlentities($e['message'], ENT_QUOTES) . "</p>";
+        exit;
+    }
+} catch (Exception $e) {
+    echo "<p>Error al ejecutar la consulta: " . htmlentities($e->getMessage(), ENT_QUOTES) . "</p>";
+    exit;
 }
 
-// Preparar la consulta para la vista FIDE_PROMOCIONES_ACTIVAS_V
+// Preparar la consulta para la vista de estado de registro
 $query_select_estado_registro = 'SELECT * FROM V_VEHICULOS_ESTADO_REGISTRO';
-$stmt_select_estado_registro = $conexion->prepare($query_select_estado_registro);
- 
+$stid_select_estado_registro = oci_parse($conn, $query_select_estado_registro);
+
 try {
     // Ejecutar la consulta
-    $stmt_select_estado_registro->execute();
-} catch (PDOException $e) {
-    echo "Error al ejecutar la consulta: " . $e->getMessage();
-    exit();
+    if (!oci_execute($stid_select_estado_registro)) {
+        $e = oci_error($stid_select_estado_registro);
+        echo "<p>Error al ejecutar la consulta: " . htmlentities($e['message'], ENT_QUOTES) . "</p>";
+        exit;
+    }
+} catch (Exception $e) {
+    echo "<p>Error al ejecutar la consulta: " . htmlentities($e->getMessage(), ENT_QUOTES) . "</p>";
+    exit;
 }
-
- 
 ?>
- 
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gestión de Promociones</title>
+<title>Gestión de Vehículos</title>
 <link rel="stylesheet" href="/CSS/promo.css">
-<style> /*Momentanio*/
+<style> 
+/* Estilos personalizados */
 body {
     font-family: 'Roboto', sans-serif;
     margin: 20px;
@@ -159,18 +164,18 @@ tr:hover {
 </style>
 </head>
 <body>
- 
-<center> <h1><a href="../tablas.php" style="text-decoration: none; color: #000000;">Visualización AutoMax</a></h1><center>
- 
-<!-- Tabla para mostrar promociones activas -->
-<center><h2>Vehiculos Activos</h2><center>
+
+<center><h1><a href="../tablas.php" style="text-decoration: none; color: #000000;">Visualización AutoMax</a></h1></center>
+
+<!-- Tabla para mostrar vehículos activos -->
+<center><h2>Vehículos Activos</h2></center>
 
 <?php
 // Mostrar los datos en la tabla
 echo '<table border="1">';
 echo '<tr><th>NUM_PLACA</th><th>TIPO_VEHICULO</th><th>MARCA</th><th>MODELO</th><th>FECHA_REGISTRO</th></tr>';
- 
-while ($row = $stmt_select_vehiculos_activos->fetch(PDO::FETCH_ASSOC)) {
+
+while ($row = oci_fetch_assoc($stid_select_vehiculos_activos)) {
     echo '<tr>';
     foreach ($row as $key => $value) {
         echo '<td>' . htmlspecialchars($value) . '</td>';
@@ -178,20 +183,17 @@ while ($row = $stmt_select_vehiculos_activos->fetch(PDO::FETCH_ASSOC)) {
     echo '</tr>';
 }
 echo '</table>';
- 
-// Desconectar
-Desconectar($conexion);
 ?>
 
-<!-- Tabla para mostrar promociones activas -->
-<center><h2>Registro del Estado de los Vehiculos</h2><center>
+<!-- Tabla para mostrar el estado de los vehículos -->
+<center><h2>Registro del Estado de los Vehículos</h2></center>
 
 <?php
 // Mostrar los datos en la tabla
 echo '<table border="1">';
 echo '<tr><th>NUM_PLACA</th><th>TIPO_VEHICULO</th><th>ESTADO_VEHICULO</th><th>FECHA_REGISTRO</th></tr>';
- 
-while ($row = $stmt_select_estado_registro->fetch(PDO::FETCH_ASSOC)) {
+
+while ($row = oci_fetch_assoc($stid_select_estado_registro)) {
     echo '<tr>';
     foreach ($row as $key => $value) {
         echo '<td>' . htmlspecialchars($value) . '</td>';
@@ -199,11 +201,12 @@ while ($row = $stmt_select_estado_registro->fetch(PDO::FETCH_ASSOC)) {
     echo '</tr>';
 }
 echo '</table>';
- 
-// Desconectar
-Desconectar($conexion);
+
+// Liberar recursos y cerrar la conexión
+oci_free_statement($stid_select_vehiculos_activos);
+oci_free_statement($stid_select_estado_registro);
+oci_close($conn);
 ?>
 
- 
 </body>
 </html>

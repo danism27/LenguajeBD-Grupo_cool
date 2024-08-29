@@ -1,30 +1,29 @@
 <?php
-include '../DAL/conexion.php';
-
- 
-// Establecer la conexión
-try {
-    $conexion = Conecta();
-} catch (PDOException $e) {
-    echo "Error de conexión: " . $e->getMessage();
-    exit();
+// Establecer la conexión con Oracle usando oci_connect
+$conn = oci_connect('AutoMax', '123', 'localhost/ORCL');
+if (!$conn) {
+    $e = oci_error();
+    echo "<p>Error al conectar a la base de datos: " . htmlentities($e['message'], ENT_QUOTES) . "</p>";
+    exit;
 }
- 
-// Preparar la consulta para la vista FIDE_PROMOCIONES_ACTIVAS_V
+
+// Preparar la consulta para la vista de precios de servicios
 $query_select_precios_servicios = 'SELECT * FROM V_SERVICIOS_PRECIOS';
-$stmt_select_precios_servicios = $conexion->prepare($query_select_precios_servicios);
- 
+$stid_select_precios_servicios = oci_parse($conn, $query_select_precios_servicios);
+
 try {
     // Ejecutar la consulta
-    $stmt_select_precios_servicios->execute();
-} catch (PDOException $e) {
-    echo "Error al ejecutar la consulta: " . $e->getMessage();
-    exit();
+    if (!oci_execute($stid_select_precios_servicios)) {
+        $e = oci_error($stid_select_precios_servicios);
+        echo "<p>Error al ejecutar la consulta: " . htmlentities($e['message'], ENT_QUOTES) . "</p>";
+        exit;
+    }
+} catch (Exception $e) {
+    echo "<p>Error al ejecutar la consulta: " . htmlentities($e->getMessage(), ENT_QUOTES) . "</p>";
+    exit;
 }
-
- 
 ?>
- 
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -32,7 +31,8 @@ try {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Gestión de Promociones</title>
 <link rel="stylesheet" href="/CSS/promo.css">
-<style> /*Momentanio*/
+<style> 
+/* Estilos personalizados */
 body {
     font-family: 'Roboto', sans-serif;
     margin: 20px;
@@ -148,18 +148,18 @@ tr:hover {
 </style>
 </head>
 <body>
- 
-<center> <h1><a href="../tablas.php" style="text-decoration: none; color: #000000;">Visualización AutoMax</a></h1><center>
- 
-<!-- Tabla para mostrar promociones activas -->
-<center><h2>Precios de los Servicios</h2><center>
+
+<center><h1><a href="../tablas.php" style="text-decoration: none; color: #000000;">Visualización AutoMax</a></h1></center>
+
+<!-- Tabla para mostrar precios de los servicios -->
+<center><h2>Precios de los Servicios</h2></center>
 
 <?php
 // Mostrar los datos en la tabla
 echo '<table border="1">';
 echo '<tr><th>COD_SERVICIO</th><th>NOMBRE_SERVICIO</th><th>DESCRIPCION_SERVICIO</th><th>PRECIO_SERVICIO</th></tr>';
- 
-while ($row = $stmt_select_precios_servicios->fetch(PDO::FETCH_ASSOC)) {
+
+while ($row = oci_fetch_assoc($stid_select_precios_servicios)) {
     echo '<tr>';
     foreach ($row as $key => $value) {
         echo '<td>' . htmlspecialchars($value) . '</td>';
@@ -167,11 +167,11 @@ while ($row = $stmt_select_precios_servicios->fetch(PDO::FETCH_ASSOC)) {
     echo '</tr>';
 }
 echo '</table>';
- 
+
 // Desconectar
-Desconectar($conexion);
+oci_free_statement($stid_select_precios_servicios);
+oci_close($conn);
 ?>
 
- 
 </body>
 </html>

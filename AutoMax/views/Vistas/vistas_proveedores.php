@@ -1,30 +1,29 @@
 <?php
-include '../DAL/conexion.php';
-
- 
-// Establecer la conexión
-try {
-    $conexion = Conecta();
-} catch (PDOException $e) {
-    echo "Error de conexión: " . $e->getMessage();
-    exit();
+// Establecer la conexión con Oracle usando oci_connect
+$conn = oci_connect('AutoMax', '123', 'localhost/ORCL');
+if (!$conn) {
+    $e = oci_error();
+    echo "<p>Error al conectar a la base de datos: " . htmlentities($e['message'], ENT_QUOTES) . "</p>";
+    exit;
 }
- 
-// Preparar la consulta para la vista FIDE_PROMOCIONES_ACTIVAS_V
+
+// Preparar la consulta para la vista de proveedores
 $query_select_proveedores = 'SELECT * FROM V_PROVEEDORES';
-$stmt_select_proveedores = $conexion->prepare($query_select_proveedores);
- 
+$stid_select_proveedores = oci_parse($conn, $query_select_proveedores);
+
 try {
     // Ejecutar la consulta
-    $stmt_select_proveedores->execute();
-} catch (PDOException $e) {
-    echo "Error al ejecutar la consulta: " . $e->getMessage();
-    exit();
+    if (!oci_execute($stid_select_proveedores)) {
+        $e = oci_error($stid_select_proveedores);
+        echo "<p>Error al ejecutar la consulta: " . htmlentities($e['message'], ENT_QUOTES) . "</p>";
+        exit;
+    }
+} catch (Exception $e) {
+    echo "<p>Error al ejecutar la consulta: " . htmlentities($e->getMessage(), ENT_QUOTES) . "</p>";
+    exit;
 }
-
- 
 ?>
- 
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -32,7 +31,8 @@ try {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Gestión de Promociones</title>
 <link rel="stylesheet" href="/CSS/promo.css">
-<style> /*Momentanio*/
+<style> 
+/* Estilos personalizados */
 body {
     font-family: 'Roboto', sans-serif;
     margin: 20px;
@@ -148,18 +148,18 @@ tr:hover {
 </style>
 </head>
 <body>
- 
-<center> <h1><a href="../tablas.php" style="text-decoration: none; color: #000000;">Visualización AutoMax</a></h1><center>
- 
-<!-- Tabla para mostrar promociones activas -->
-<center><h2>Proveedores de AutoMax</h2><center>
+
+<center><h1><a href="../tablas.php" style="text-decoration: none; color: #000000;">Visualización AutoMax</a></h1></center>
+
+<!-- Tabla para mostrar proveedores -->
+<center><h2>Proveedores de AutoMax</h2></center>
 
 <?php
 // Mostrar los datos en la tabla
 echo '<table border="1">';
 echo '<tr><th>ID_CONTACTO</th><th>NOMBRE_CONTACTO</th><th>DIRECCION_CONTACTO</th><th>TELEFONO_CONTACTO</th><th>EMAIL_CONTACTO</th></tr>';
- 
-while ($row = $stmt_select_proveedores->fetch(PDO::FETCH_ASSOC)) {
+
+while ($row = oci_fetch_assoc($stid_select_proveedores)) {
     echo '<tr>';
     foreach ($row as $key => $value) {
         echo '<td>' . htmlspecialchars($value) . '</td>';
@@ -167,11 +167,11 @@ while ($row = $stmt_select_proveedores->fetch(PDO::FETCH_ASSOC)) {
     echo '</tr>';
 }
 echo '</table>';
- 
+
 // Desconectar
-Desconectar($conexion);
+oci_free_statement($stid_select_proveedores);
+oci_close($conn);
 ?>
 
- 
 </body>
 </html>
