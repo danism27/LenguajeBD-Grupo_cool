@@ -34,6 +34,10 @@
 					</li>
 					<li class="nav-item">
 						<a class="nav-link" href="views/tablas.php">Vistas</a>
+					<li class="nav-item">
+						<a class="nav-link" href="views/tablas.php">Funciones</a>	
+						<li class="nav-item">
+						<a class="nav-link" href="views/tablas.php">Procedimientos</a>
 					</li>
 				</ul>
 			</div>
