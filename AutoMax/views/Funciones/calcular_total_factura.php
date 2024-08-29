@@ -1,15 +1,15 @@
 <?php
-// Verificar si se ha proporcionado un ID en la URL
-if (isset($_GET['id'])) {
-    $id_factura = $_GET['id'];
+// Conectar a la base de datos
+$conn = oci_connect('AutoMax', '123', 'localhost/ORCL');
+if (!$conn) {
+    $e = oci_error();
+    echo "<p>Error al conectar a la base de datos: " . htmlentities($e['message'], ENT_QUOTES) . "</p>";
+    exit;
+}
 
-    // Conectar a la base de datos
-    $conn = oci_connect('AutoMax', '123', 'localhost/ORCL');
-    if (!$conn) {
-        $e = oci_error();
-        echo "<p>Error al conectar a la base de datos: " . htmlentities($e['message'], ENT_QUOTES) . "</p>";
-        exit;
-    }
+// Verificar si se ha enviado el formulario
+if (isset($_POST['submit'])) {
+    $id_factura = $_POST['id_factura'];
 
     // Preparar y ejecutar el bloque PL/SQL para obtener el total de la factura
     $sql = 'BEGIN :total := calcular_total_factura(:id_factura); END;';
@@ -23,11 +23,15 @@ if (isset($_GET['id'])) {
     // Ejecutar el bloque PL/SQL
     oci_execute($stid);
     oci_free_statement($stid);
-    oci_close($conn);
 } else {
-    echo "<p>No se proporcionó un ID de factura en la URL.</p>";
-    exit();
+    $id_factura = null;
+    $total = null;
 }
+
+// Obtener la lista de facturas para el formulario
+$sql = 'SELECT COD_FACTURA, FECHA_FACTURA FROM FACTURAS ORDER BY FECHA_FACTURA DESC';
+$stid = oci_parse($conn, $sql);
+oci_execute($stid);
 ?>
 
 <!DOCTYPE html>
@@ -66,13 +70,31 @@ if (isset($_GET['id'])) {
 
     <div class="container">
         <h1 class="text-center">Total de Factura</h1>
-        <?php if (isset($total)) : ?>
+        
+        <form method="post" action="calcular_total_factura.php">
+            <div class="mb-3">
+                <label for="id_factura" class="form-label">Selecciona la Factura:</label>
+                <select id="id_factura" name="id_factura" class="form-select" required>
+                    <option value="">Seleccione una factura</option>
+                    <?php while ($row = oci_fetch_assoc($stid)) : ?>
+                        <option value="<?php echo htmlentities($row['COD_FACTURA'], ENT_QUOTES); ?>">
+                            Factura ID: <?php echo htmlentities($row['COD_FACTURA'], ENT_QUOTES); ?> - 
+                            Fecha: <?php echo htmlentities($row['FECHA_FACTURA'], ENT_QUOTES); ?>
+                        </option>
+                    <?php endwhile; ?>
+                </select>
+            </div>
+            <button type="submit" name="submit" class="btn btn-primary">Calcular Total</button>
+        </form>
+
+        <?php if ($total !== null) : ?>
+            <br>
             <p class="text-center">El total de la factura con ID <?php echo htmlentities($id_factura, ENT_QUOTES); ?> es: <?php echo number_format($total, 2, ',', '.'); ?>.</p>
-        <?php else : ?>
-            <p class="text-center">No se encontró información para la factura proporcionada.</p>
+        <?php elseif ($id_factura === null) : ?>
+            <p class="text-center">No se ha seleccionado ninguna factura.</p>
         <?php endif; ?>
         <br>
-        <a class="btn btn-secondary" href="Tabla_Facturas.php">Volver</a>
+        <a class="btn btn-secondary" href="/LenguajeBD-Grupo_cool3/AutoMax/views/tablas.php">Volver</a>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
@@ -106,3 +128,8 @@ if (isset($_GET['id'])) {
 </footer>
 
 </html>
+
+<?php
+oci_free_statement($stid);
+oci_close($conn);
+?>

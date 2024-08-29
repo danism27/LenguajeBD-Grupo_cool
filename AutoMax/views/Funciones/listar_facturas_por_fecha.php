@@ -1,8 +1,12 @@
 <?php
-// Verificar si se han proporcionado las fechas en la URL
-if (isset($_GET['fecha_inicio']) && isset($_GET['fecha_fin'])) {
-    $fecha_inicio = $_GET['fecha_inicio'];
-    $fecha_fin = $_GET['fecha_fin'];
+// Verificar si se han proporcionado las fechas en el formulario POST
+if (isset($_POST['fecha_inicio']) && isset($_POST['fecha_fin'])) {
+    $fecha_inicio = $_POST['fecha_inicio'];
+    $fecha_fin = $_POST['fecha_fin'];
+
+    // Convertir las fechas al formato 'YYYY-MM-DD'
+    $fecha_inicio = date('Y-m-d', strtotime($fecha_inicio));
+    $fecha_fin = date('Y-m-d', strtotime($fecha_fin));
 
     // Conectar a la base de datos
     $conn = oci_connect('AutoMax', '123', 'localhost/ORCL');
@@ -37,8 +41,7 @@ if (isset($_GET['fecha_inicio']) && isset($_GET['fecha_fin'])) {
     oci_free_statement($cursor);
     oci_close($conn);
 } else {
-    echo "<p>No se proporcionaron las fechas en la URL.</p>";
-    exit();
+    $facturas = [];
 }
 ?>
 
@@ -77,8 +80,24 @@ if (isset($_GET['fecha_inicio']) && isset($_GET['fecha_fin'])) {
     <br><br><br><br><br>
 
     <div class="container">
-        <h1 class="text-center">Lista de Facturas</h1>
-        <?php if (!empty($facturas)) : ?>
+        <h1 class="text-center">Lista de Facturas por Fecha</h1>
+
+        <!-- Formulario para seleccionar el rango de fechas -->
+        <form method="POST" action="listar_facturas_por_fecha.php">
+            <div class="mb-3">
+                <label for="fecha_inicio" class="form-label">Fecha de Inicio</label>
+                <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" required>
+            </div>
+            <div class="mb-3">
+                <label for="fecha_fin" class="form-label">Fecha de Fin</label>
+                <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Buscar</button>
+        </form>
+
+        <br>
+
+        <?php if (!empty($facturas)): ?>
             <table class="table table-striped">
                 <thead>
                     <tr>
@@ -88,7 +107,7 @@ if (isset($_GET['fecha_inicio']) && isset($_GET['fecha_fin'])) {
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($facturas as $factura) : ?>
+                    <?php foreach ($facturas as $factura): ?>
                         <tr>
                             <td><?php echo htmlentities($factura['COD_FACTURA'], ENT_QUOTES); ?></td>
                             <td><?php echo htmlentities(date('d-m-Y', strtotime($factura['FECHA_FACTURA'])), ENT_QUOTES); ?></td>
@@ -97,11 +116,12 @@ if (isset($_GET['fecha_inicio']) && isset($_GET['fecha_fin'])) {
                     <?php endforeach; ?>
                 </tbody>
             </table>
-        <?php else : ?>
+        <?php elseif ($_SERVER['REQUEST_METHOD'] == 'POST'): ?>
             <p class="text-center">No se encontraron facturas para el rango de fechas proporcionado.</p>
         <?php endif; ?>
+
         <br>
-        <a class="btn btn-secondary" href="index.php">Volver</a>
+        <a class="btn btn-secondary" href="/LenguajeBD-Grupo_cool3/AutoMax/views/tablas.php">Volver</a>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>

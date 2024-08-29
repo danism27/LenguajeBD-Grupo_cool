@@ -1,17 +1,20 @@
 <?php
-// Verificar si se ha proporcionado un tipo en la URL
-if (isset($_GET['tipo'])) {
-    $tipo_contacto = $_GET['tipo'];
+// Conectar a la base de datos
+$conn = oci_connect('AutoMax', '123', 'localhost/ORCL');
+if (!$conn) {
+    $e = oci_error();
+    echo "<p>Error al conectar a la base de datos: " . htmlentities($e['message'], ENT_QUOTES) . "</p>";
+    exit;
+}
 
-    // Conectar a la base de datos
-    $conn = oci_connect('AutoMax', '123', 'localhost/ORCL');
-    if (!$conn) {
-        $e = oci_error();
-        echo "<p>Error al conectar a la base de datos: " . htmlentities($e['message'], ENT_QUOTES) . "</p>";
-        exit;
-    }
+// Inicializar variables
+$contactos = [];
 
-    // Preparar y ejecutar el bloque PL/SQL para listar contactos
+// Verificar si se ha enviado el formulario
+if (isset($_POST['submit'])) {
+    $tipo_contacto = $_POST['tipo_contacto'];
+
+    // Preparar y ejecutar el bloque PL/SQL para listar contactos por tipo
     $sql = 'BEGIN :cursor := listar_contactos_por_tipo(:tipo_contacto); END;';
     $stid = oci_parse($conn, $sql);
 
@@ -33,7 +36,6 @@ if (isset($_GET['tipo'])) {
     oci_execute($cursor);
 
     // Fetch all rows from the cursor
-    $contactos = [];
     while ($row = oci_fetch_assoc($cursor)) {
         $contactos[] = $row;
     }
@@ -41,18 +43,19 @@ if (isset($_GET['tipo'])) {
     // Liberar recursos
     oci_free_statement($stid);
     oci_free_statement($cursor);
-    oci_close($conn);
-} else {
-    echo "<p>No se proporcionó un tipo de contacto en la URL.</p>";
-    exit();
 }
+
+// Obtener tipos de contacto para el formulario
+$sql = 'SELECT DISTINCT TIPO_CONTACTO FROM CONTACTOS ORDER BY TIPO_CONTACTO';
+$stid = oci_parse($conn, $sql);
+oci_execute($stid);
 ?>
 
 <!DOCTYPE html>
 <html lang="es">
 
 <head>
-    <title>Lista de Contactos</title>
+    <title>Lista de Contactos por Tipo</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="main.css">
@@ -84,8 +87,24 @@ if (isset($_GET['tipo'])) {
 
     <div class="container">
         <h1 class="text-center">Lista de Contactos por Tipo</h1>
+
+        <form method="post" action="listar_contactos_por_tipo.php">
+            <div class="mb-3">
+                <label for="tipo_contacto" class="form-label">Selecciona el Tipo de Contacto:</label>
+                <select id="tipo_contacto" name="tipo_contacto" class="form-select" required>
+                    <option value="">Seleccione un tipo de contacto</option>
+                    <?php while ($row = oci_fetch_assoc($stid)) : ?>
+                        <option value="<?php echo htmlentities($row['TIPO_CONTACTO'], ENT_QUOTES); ?>">
+                            <?php echo htmlentities($row['TIPO_CONTACTO'], ENT_QUOTES); ?>
+                        </option>
+                    <?php endwhile; ?>
+                </select>
+            </div>
+            <button type="submit" name="submit" class="btn btn-primary">Listar Contactos</button>
+        </form>
+
         <?php if (!empty($contactos)) : ?>
-            <table class="table table-striped">
+            <table class="table table-striped mt-4">
                 <thead>
                     <tr>
                         <th>Código de Contacto</th>
@@ -103,11 +122,11 @@ if (isset($_GET['tipo'])) {
                     <?php endforeach; ?>
                 </tbody>
             </table>
-        <?php else : ?>
+        <?php elseif (isset($_POST['submit'])) : ?>
             <p class="text-center">No se encontraron contactos para el tipo proporcionado.</p>
         <?php endif; ?>
         <br>
-        <a class="btn btn-secondary" href="index.php">Volver</a>
+        <a class="btn btn-secondary" href="/LenguajeBD-Grupo_cool3/AutoMax/views/tablas.php">Volver</a>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
@@ -141,3 +160,8 @@ if (isset($_GET['tipo'])) {
 </footer>
 
 </html>
+
+<?php
+oci_free_statement($stid);
+oci_close($conn);
+?>

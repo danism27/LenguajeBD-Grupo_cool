@@ -1,21 +1,33 @@
 <?php
-// Verificar si se ha proporcionado un cargo en la URL
-if (isset($_GET['cargo'])) {
-    $cargo = $_GET['cargo'];
+// Conectar a la base de datos
+$conn = oci_connect('AutoMax', '123', 'localhost/ORCL');
+if (!$conn) {
+    $e = oci_error();
+    echo "<p>Error al conectar a la base de datos: " . htmlentities($e['message'], ENT_QUOTES) . "</p>";
+    exit;
+}
 
-    // Conectar a la base de datos
-    $conn = oci_connect('AutoMax', '123', 'localhost/ORCL');
-    if (!$conn) {
-        $e = oci_error();
-        echo "<p>Error al conectar a la base de datos: " . htmlentities($e['message'], ENT_QUOTES) . "</p>";
-        exit;
-    }
+$employees = [];
+$jobs = [];
+
+// Obtener la lista de cargos
+$job_sql = 'SELECT DISTINCT CARGO_EMPLEADO FROM EMPLEADOS ORDER BY CARGO_EMPLEADO';
+$job_stid = oci_parse($conn, $job_sql);
+oci_execute($job_stid);
+while (($row = oci_fetch_assoc($job_stid)) !== false) {
+    $jobs[] = $row['CARGO_EMPLEADO'];
+}
+oci_free_statement($job_stid);
+
+// Obtener empleados por cargo si se ha enviado el formulario
+if (isset($_POST['cargo'])) {
+    $cargo = $_POST['cargo'];
 
     // Preparar y ejecutar el bloque PL/SQL para obtener los empleados por cargo
     $sql = 'BEGIN :cursor := listar_empleados_por_cargo(:cargo); END;';
     $stid = oci_parse($conn, $sql);
     
-    // Bind variables
+    // Crear un cursor
     $cursor = oci_new_cursor($conn);
     oci_bind_by_name($stid, ':cargo', $cargo);
     oci_bind_by_name($stid, ':cursor', $cursor, -1, OCI_B_CURSOR);
@@ -23,11 +35,10 @@ if (isset($_GET['cargo'])) {
     // Ejecutar el bloque PL/SQL
     oci_execute($stid);
     
-    // Abrir y obtener datos del cursor
+    // Ejecutar el cursor
     oci_execute($cursor);
     
     // Fetch all rows from the cursor
-    $employees = [];
     while (($row = oci_fetch_assoc($cursor)) !== false) {
         $employees[] = $row;
     }
@@ -35,11 +46,9 @@ if (isset($_GET['cargo'])) {
     // Libera los recursos
     oci_free_statement($stid);
     oci_free_statement($cursor);
-    oci_close($conn);
-} else {
-    echo "<p>No se proporcionó un cargo en la URL.</p>";
-    exit();
 }
+
+oci_close($conn);
 ?>
 
 <!DOCTYPE html>
@@ -78,7 +87,25 @@ if (isset($_GET['cargo'])) {
 
     <div class="container">
         <h1 class="text-center">Lista de Empleados por Cargo</h1>
-        
+
+        <!-- Formulario para seleccionar el cargo -->
+        <form method="POST" action="listar_empleados_por_cargo.php">
+            <div class="mb-3">
+                <label for="cargo" class="form-label">Selecciona un Cargo</label>
+                <select class="form-control" id="cargo" name="cargo" required>
+                    <option value="">Selecciona un cargo</option>
+                    <?php foreach ($jobs as $job): ?>
+                        <option value="<?php echo htmlentities($job, ENT_QUOTES); ?>">
+                            <?php echo htmlentities($job, ENT_QUOTES); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Buscar</button>
+        </form>
+
+        <br>
+
         <?php if (!empty($employees)): ?>
             <table class="table table-bordered">
                 <thead>
@@ -98,20 +125,18 @@ if (isset($_GET['cargo'])) {
                     <?php endforeach; ?>
                 </tbody>
             </table>
-        <?php else: ?>
+        <?php elseif ($_SERVER['REQUEST_METHOD'] == 'POST'): ?>
             <p>No se encontraron empleados con el cargo proporcionado.</p>
         <?php endif; ?>
         
         <br>
-        <a class="btn btn-secondary" href="index.php">Volver</a>
+        <a class="btn btn-secondary" href="/LenguajeBD-Grupo_cool3/AutoMax/views/tablas.php">Volver</a>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 </body>
-
-</html>
 
 <footer>
     <div class="footer bg-dark mt-5 p-5 text-center navbar-dark" style="color: white; background-color: #000000;">

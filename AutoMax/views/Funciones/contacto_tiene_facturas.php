@@ -1,15 +1,15 @@
 <?php
-// Verificar si se ha proporcionado un ID en la URL
-if (isset($_GET['id'])) {
-    $id_contacto = $_GET['id'];
+// Conectar a la base de datos
+$conn = oci_connect('AutoMax', '123', 'localhost/ORCL');
+if (!$conn) {
+    $e = oci_error();
+    echo "<p>Error al conectar a la base de datos: " . htmlentities($e['message'], ENT_QUOTES) . "</p>";
+    exit;
+}
 
-    // Conectar a la base de datos
-    $conn = oci_connect('AutoMax', '123', 'localhost/ORCL');
-    if (!$conn) {
-        $e = oci_error();
-        echo "<p>Error al conectar a la base de datos: " . htmlentities($e['message'], ENT_QUOTES) . "</p>";
-        exit;
-    }
+// Verificar si se ha enviado el formulario
+if (isset($_POST['submit'])) {
+    $id_contacto = $_POST['id_contacto'];
 
     // Preparar y ejecutar el bloque PL/SQL para verificar si el contacto tiene facturas
     $sql = 'BEGIN :resultado := contacto_tiene_facturas(:id_contacto); END;';
@@ -18,18 +18,22 @@ if (isset($_GET['id'])) {
     // Bind variables
     $resultado = null;
     oci_bind_by_name($stid, ':id_contacto', $id_contacto);
-    oci_bind_by_name($stid, ':resultado', $resultado, 100); // Adjust size if necessary
+    oci_bind_by_name($stid, ':resultado', $resultado, 100); // Ajustar tamaño si es necesario
     
     // Ejecutar el bloque PL/SQL
     oci_execute($stid);
     
-    // Libera los recursos
+    // Liberar el recurso del statement
     oci_free_statement($stid);
-    oci_close($conn);
 } else {
-    echo "<p>No se proporcionó un ID de contacto en la URL.</p>";
-    exit();
+    $id_contacto = null;
+    $resultado = null;
 }
+
+// Obtener la lista de contactos para el formulario
+$sql = 'SELECT ID_CONTACTO, NOMBRE_CONTACTO FROM CONTACTOS ORDER BY NOMBRE_CONTACTO ASC';
+$stid = oci_parse($conn, $sql);
+oci_execute($stid);
 ?>
 
 <!DOCTYPE html>
@@ -68,9 +72,28 @@ if (isset($_GET['id'])) {
 
     <div class="container">
         <h1 class="text-center">Verificación de Facturas del Contacto</h1>
-        <div class="text-center">
-            <p><?php echo htmlentities($resultado, ENT_QUOTES); ?></p>
-        </div>
+        
+        <form method="post" action="verificar_facturas.php">
+            <div class="mb-3">
+                <label for="id_contacto" class="form-label">Selecciona el Contacto:</label>
+                <select id="id_contacto" name="id_contacto" class="form-select" required>
+                    <option value="">Seleccione un contacto</option>
+                    <?php while ($row = oci_fetch_assoc($stid)) : ?>
+                        <option value="<?php echo htmlentities($row['ID_CONTACTO'], ENT_QUOTES); ?>">
+                            <?php echo htmlentities($row['NOMBRE_CONTACTO'], ENT_QUOTES); ?>
+                        </option>
+                    <?php endwhile; ?>
+                </select>
+            </div>
+            <button type="submit" name="submit" class="btn btn-primary">Verificar Facturas</button>
+        </form>
+
+        <?php if ($resultado !== null) : ?>
+            <br>
+            <p class="text-center"><?php echo htmlentities($resultado, ENT_QUOTES); ?></p>
+        <?php elseif ($id_contacto === null) : ?>
+            <p class="text-center">No se ha seleccionado ningún contacto.</p>
+        <?php endif; ?>
         <br>
         <a class="btn btn-secondary" href="index.php">Volver</a>
     </div>
@@ -106,3 +129,9 @@ if (isset($_GET['id'])) {
 </footer>
 
 </html>
+
+<?php
+// Liberar los recursos del statement y cerrar la conexión
+oci_free_statement($stid);
+oci_close($conn);
+?>
