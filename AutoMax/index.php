@@ -33,6 +33,12 @@
 						<a class="nav-link" href="views/tablas.php">Ver tablas</a>
 					</li>
 					<li class="nav-item">
+						<a class="nav-link" href="views/tablas.php">Procedimientos</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="views/tablas.php">Funciones</a>
+					</li>
+					<li class="nav-item">
 						<a class="nav-link" href="views/tablas.php">Vistas</a>
 					</li>
 				</ul>
