@@ -64,6 +64,38 @@
         </div>
     </div>
 
+    <div class="container">
+        <h1 class="text-center">Menú de Procedimientos</h1>
+        <div class="list-group">
+            <a href="Procedimientos/contar_empelados.php" class="list-group-item list-group-item-action">Contar Empleados</a>
+            <a href="Procedimientos/contar_repuestos.php" class="list-group-item list-group-item-action">Contar Repuestos</a>
+            <a href="Procedimientos/detalles_repuesto.php" class="list-group-item list-group-item-action">Detalles Repuestos</a>
+            <a href="Procedimientos/nombre_por_cargo_empleado.php" class="list-group-item list-group-item-action">Mostrar nombre de cargo por empleado</a>
+            <a href="Procedimientos/mostrar_oficinas.php" class="list-group-item list-group-item-action">Mostrar Oficinas</a>
+            <a href="Procedimientos/mostrar_servicios_precio_mayor.php" class="list-group-item list-group-item-action">Mostrar servicios por Precio Mayor</a>
+            <a href="Procedimientos/promedio_precios_repuestos.php" class="list-group-item list-group-item-action">Promedio de precios por repuestos</a>
+            <a href="Procedimientos/total_facturas_cliente.php" class="list-group-item list-group-item-action">Total facturas por Cliente</a>
+            <a href="Procedimientos/total_servicios_facturados.php" class="list-group-item list-group-item-action">Total de Servicios Facturas</a>
+            <a href="Procedimientos/total_ventas_clientes_nombre.php" class="list-group-item list-group-item-action">Total de Ventas por Nombre de Cliente</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1 class="text-center">Menú de Funciones</h1>
+        <div class="list-group">
+        <a href="Funciones/calcular_total_factura.php" class="list-group-item list-group-item-action">Calcular el Total de la Factura</a>
+        <a href="Funciones/contacto_tiene_facturas.php" class="list-group-item list-group-item-action">Facturas por Contacto</a>
+        <a href="Funciones/listar_contactos_tipo.php" class="list-group-item list-group-item-action">Lista de Contactos por tipo</a>
+        <a href="Funciones/listar_empleados_por_cargo.php" class="list-group-item list-group-item-action">Lista de Empleados por cargo</a>
+        <a href="Funciones/listar_facturas_por_fecha.php" class="list-group-item list-group-item-action">Lista de Facturas por fecha</a>
+        <a href="Funciones/listar_repuestos_por_factura.php" class="list-group-item list-group-item-action">Lista de repuestos por factura</a>
+        <a href="Funciones/obtener_descripcion_servicio.php" class="list-group-item list-group-item-action">Descripcion del Servicio</a>
+        <a href="Funciones/obtener_fecha_contratacion.php" class="list-group-item list-group-item-action">Fecha de Contratacion</a>
+        <a href="Funciones/obtener_informacion_oficina.php" class="list-group-item list-group-item-action">Informacion de Oficina</a>
+        <a href="Funciones/obtener_nombre_contacto.php" class="list-group-item list-group-item-action">Nombre de Contacto</a>
+        </div>
+    </div>
+
 </body>
 
 <footer>
