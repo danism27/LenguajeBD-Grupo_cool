@@ -2794,3 +2794,252 @@ BEGIN
     CLOSE c_facturas_repuestos;
 END;
 /
+
+
+/*
+********
+*                                                                    *
+*                            Paquetes                                *
+*                                                                    *
+********
+*/
+
+-- 1. Paquete de Contactos --
+-- Este paquete gestiona la selección y obtención de contactos, diferenciando entre clientes y proveedores.
+CREATE OR REPLACE PACKAGE contactos_pkg AS
+    PROCEDURE select_contactos_por_tipo(p_tipo_contacto IN CONTACTOS.TIPO_CONTACTO%TYPE);
+    PROCEDURE select_contactos_por_nombre(p_nombre_contacto IN CONTACTOS.NOMBRE_CONTACTO%TYPE);
+    FUNCTION obtener_clientes RETURN SYS_REFCURSOR;
+    FUNCTION obtener_proveedores RETURN SYS_REFCURSOR;
+END contactos_pkg;
+/
+
+CREATE OR REPLACE PACKAGE BODY contactos_pkg AS
+    PROCEDURE select_contactos_por_tipo(p_tipo_contacto IN CONTACTOS.TIPO_CONTACTO%TYPE) AS
+    BEGIN
+        FOR r IN (SELECT * FROM CONTACTOS WHERE TIPO_CONTACTO = p_tipo_contacto) LOOP
+            DBMS_OUTPUT.PUT_LINE('ID: ' || r.ID_CONTACTO || ', Nombre: ' || r.NOMBRE_CONTACTO);
+        END LOOP;
+    END;
+
+    PROCEDURE select_contactos_por_nombre(p_nombre_contacto IN CONTACTOS.NOMBRE_CONTACTO%TYPE) AS
+    BEGIN
+        FOR r IN (SELECT * FROM CONTACTOS WHERE NOMBRE_CONTACTO = p_nombre_contacto) LOOP
+            DBMS_OUTPUT.PUT_LINE('ID: ' || r.ID_CONTACTO || ', Tipo: ' || r.TIPO_CONTACTO);
+        END LOOP;
+    END;
+
+    FUNCTION obtener_clientes RETURN SYS_REFCURSOR IS
+        v_cursor SYS_REFCURSOR;
+    BEGIN
+        OPEN v_cursor FOR SELECT * FROM CONTACTOS WHERE TIPO_CONTACTO = 'Cliente';
+        RETURN v_cursor;
+    END;
+
+    FUNCTION obtener_proveedores RETURN SYS_REFCURSOR IS
+        v_cursor SYS_REFCURSOR;
+    BEGIN
+        OPEN v_cursor FOR SELECT * FROM CONTACTOS WHERE TIPO_CONTACTO = 'Proveedor';
+        RETURN v_cursor;
+    END;
+END contactos_pkg;
+/
+
+-- 2. Paquete de Facturas --
+-- Este paquete facilita la gestión de facturas, permitiendo filtrarlas por cliente o fecha y obtener diferentes vistas de las facturas.
+CREATE OR REPLACE PACKAGE facturas_pkg AS
+    PROCEDURE select_facturas_por_cliente(p_cod_cliente IN FACTURAS.COD_CLIENTE%TYPE);
+    PROCEDURE select_facturas_por_fecha(p_fecha_factura IN FACTURAS.FECHA_FACTURA%TYPE);
+    FUNCTION obtener_facturas RETURN SYS_REFCURSOR;
+    FUNCTION obtener_facturas_cliente(p_id_cliente IN INTEGER) RETURN SYS_REFCURSOR;
+    FUNCTION obtener_facturas_por_cliente(p_id_cliente IN INTEGER) RETURN SYS_REFCURSOR;
+END facturas_pkg;
+/
+
+CREATE OR REPLACE PACKAGE BODY facturas_pkg AS
+    PROCEDURE select_facturas_por_cliente(p_cod_cliente IN FACTURAS.COD_CLIENTE%TYPE) AS
+    BEGIN
+        FOR r IN (SELECT * FROM FACTURAS WHERE COD_CLIENTE = p_cod_cliente) LOOP
+            DBMS_OUTPUT.PUT_LINE('ID Factura: ' || r.ID_FACTURA || ', Total: ' || r.TOTAL_FACTURA);
+        END LOOP;
+    END;
+
+    PROCEDURE select_facturas_por_fecha(p_fecha_factura IN FACTURAS.FECHA_FACTURA%TYPE) AS
+    BEGIN
+        FOR r IN (SELECT * FROM FACTURAS WHERE FECHA_FACTURA = p_fecha_factura) LOOP
+            DBMS_OUTPUT.PUT_LINE('ID Factura: ' || r.ID_FACTURA || ', Cliente: ' || r.COD_CLIENTE);
+        END LOOP;
+    END;
+
+    FUNCTION obtener_facturas RETURN SYS_REFCURSOR IS
+        v_cursor SYS_REFCURSOR;
+    BEGIN
+        OPEN v_cursor FOR SELECT * FROM FACTURAS;
+        RETURN v_cursor;
+    END;
+
+    FUNCTION obtener_facturas_cliente(p_id_cliente IN INTEGER) RETURN SYS_REFCURSOR IS
+        v_cursor SYS_REFCURSOR;
+    BEGIN
+        OPEN v_cursor FOR SELECT * FROM FACTURAS WHERE COD_CLIENTE = p_id_cliente;
+        RETURN v_cursor;
+    END;
+
+    FUNCTION obtener_facturas_por_cliente(p_id_cliente IN INTEGER) RETURN SYS_REFCURSOR IS
+        v_cursor SYS_REFCURSOR;
+    BEGIN
+        OPEN v_cursor FOR SELECT f.ID_FACTURA, f.FECHA_FACTURA, f.TOTAL_FACTURA
+        FROM FACTURAS f
+        WHERE f.COD_CLIENTE = p_id_cliente;
+        RETURN v_cursor;
+    END;
+END facturas_pkg;
+/
+
+-- 3. Paquete de Repuestos --
+-- Este paquete gestiona la selección y obtención de repuestos, permitiendo filtrar por fecha o nombre y consultar precios.
+CREATE OR REPLACE PACKAGE repuestos_pkg AS
+    PROCEDURE select_repuestos_por_fecha(p_fecha_registro IN REPUESTOS.FECHA_REGISTRO%TYPE);
+    PROCEDURE select_repuestos_por_nombre(p_nombre_repuesto IN REPUESTOS.NOMBRE_REPUESTO%TYPE);
+    FUNCTION obtener_repuestos RETURN SYS_REFCURSOR;
+    FUNCTION obtener_repuestos_precios RETURN SYS_REFCURSOR;
+END repuestos_pkg;
+/
+
+CREATE OR REPLACE PACKAGE BODY repuestos_pkg AS
+    PROCEDURE select_repuestos_por_fecha(p_fecha_registro IN REPUESTOS.FECHA_REGISTRO%TYPE) AS
+    BEGIN
+        FOR r IN (SELECT * FROM REPUESTOS WHERE FECHA_REGISTRO = p_fecha_registro) LOOP
+            DBMS_OUTPUT.PUT_LINE('ID Repuesto: ' || r.ID_REPUESTO || ', Nombre: ' || r.NOMBRE_REPUESTO);
+        END LOOP;
+    END;
+
+    PROCEDURE select_repuestos_por_nombre(p_nombre_repuesto IN REPUESTOS.NOMBRE_REPUESTO%TYPE) AS
+    BEGIN
+        FOR r IN (SELECT * FROM REPUESTOS WHERE NOMBRE_REPUESTO = p_nombre_repuesto) LOOP
+            DBMS_OUTPUT.PUT_LINE('ID Repuesto: ' || r.ID_REPUESTO || ', Fecha Registro: ' || r.FECHA_REGISTRO);
+        END LOOP;
+    END;
+
+    FUNCTION obtener_repuestos RETURN SYS_REFCURSOR IS
+        v_cursor SYS_REFCURSOR;
+    BEGIN
+        OPEN v_cursor FOR SELECT * FROM REPUESTOS;
+        RETURN v_cursor;
+    END;
+
+    FUNCTION obtener_repuestos_precios RETURN SYS_REFCURSOR IS
+        v_cursor SYS_REFCURSOR;
+    BEGIN
+        OPEN v_cursor FOR SELECT ID_REPUESTO, NOMBRE_REPUESTO, PRECIO_REPUESTO 
+        FROM REPUESTOS;
+        RETURN v_cursor;
+    END;
+END repuestos_pkg;
+/
+
+-- 4. Paquete de Vehículos --
+-- Este paquete gestiona la selección y obtención de vehículos, permitiendo filtrar por estado o tipo de vehículo.
+CREATE OR REPLACE PACKAGE vehiculos_pkg AS
+    PROCEDURE select_vehiculos_por_estado(p_estado_vehiculo IN VEHICULOS.ESTADO_VEHICULO%TYPE);
+    PROCEDURE select_vehiculos_por_tipo(p_tipo_vehiculo IN VEHICULOS.TIPO_VEHICULO%TYPE);
+    FUNCTION obtener_vehiculos_activos RETURN SYS_REFCURSOR;
+    FUNCTION obtener_vehiculos_por_tipo(p_tipo_vehiculo IN VARCHAR2) RETURN SYS_REFCURSOR;
+END vehiculos_pkg;
+/
+
+CREATE OR REPLACE PACKAGE BODY vehiculos_pkg AS
+    PROCEDURE select_vehiculos_por_estado(p_estado_vehiculo IN VEHICULOS.ESTADO_VEHICULO%TYPE) AS
+    BEGIN
+        FOR r IN (SELECT * FROM VEHICULOS WHERE ESTADO_VEHICULO = p_estado_vehiculo) LOOP
+            DBMS_OUTPUT.PUT_LINE('ID Vehículo: ' || r.ID_VEHICULO || ', Placa: ' || r.NUM_PLACA);
+        END LOOP;
+    END;
+
+    PROCEDURE select_vehiculos_por_tipo(p_tipo_vehiculo IN VEHICULOS.TIPO_VEHICULO%TYPE) AS
+    BEGIN
+        FOR r IN (SELECT * FROM VEHICULOS WHERE TIPO_VEHICULO = p_tipo_vehiculo) LOOP
+            DBMS_OUTPUT.PUT_LINE('ID Vehículo: ' || r.ID_VEHICULO || ', Placa: ' || r.NUM_PLACA);
+        END LOOP;
+    END;
+
+    FUNCTION obtener_vehiculos_activos RETURN SYS_REFCURSOR IS
+        v_cursor SYS_REFCURSOR;
+    BEGIN
+        OPEN v_cursor FOR SELECT * FROM VEHICULOS WHERE ESTADO_VEHICULO = 'Activo';
+        RETURN v_cursor;
+    END;
+
+    FUNCTION obtener_vehiculos_por_tipo(p_tipo_vehiculo IN VARCHAR2) RETURN SYS_REFCURSOR IS
+        v_cursor SYS_REFCURSOR;
+    BEGIN
+        OPEN v_cursor FOR SELECT * FROM VEHICULOS WHERE TIPO_VEHICULO = p_tipo_vehiculo;
+        RETURN v_cursor;
+    END;
+END vehiculos_pkg;
+/
+
+-- 5. Paquete de Servicios y Empleados --
+-- Este paquete integra funciones y procedimientos para gestionar tanto servicios como empleados, permitiendo filtrar por precio, nombre y cargo.
+CREATE OR REPLACE PACKAGE servicios_empleados_pkg AS
+    PROCEDURE select_servicios_por_precio(p_precio_servicio IN SERVICIOS.PRECIO_SERVICIO%TYPE);
+    PROCEDURE select_servicios_por_nombre(p_nombre_servicio IN SERVICIOS.NOMBRE_SERVICIO%TYPE);
+    PROCEDURE select_empleados_por_cargo(p_cargo_empleado IN EMPLEADOS.CARGO_EMPLEADO%TYPE);
+    FUNCTION obtener_servicios RETURN SYS_REFCURSOR;
+    FUNCTION obtener_servicios_oficina(p_id_oficina IN INTEGER) RETURN SYS_REFCURSOR;
+    FUNCTION obtener_empleados RETURN SYS_REFCURSOR;
+    FUNCTION obtener_empleados_por_cargo(p_cargo_empleado IN VARCHAR2) RETURN SYS_REFCURSOR;
+END servicios_empleados_pkg;
+/
+
+CREATE OR REPLACE PACKAGE BODY servicios_empleados_pkg AS
+    PROCEDURE select_servicios_por_precio(p_precio_servicio IN SERVICIOS.PRECIO_SERVICIO%TYPE) AS
+    BEGIN
+        FOR r IN (SELECT * FROM SERVICIOS WHERE PRECIO_SERVICIO = p_precio_servicio) LOOP
+            DBMS_OUTPUT.PUT_LINE('ID Servicio: ' || r.ID_SERVICIO || ', Nombre: ' || r.NOMBRE_SERVICIO);
+        END LOOP;
+    END;
+
+    PROCEDURE select_servicios_por_nombre(p_nombre_servicio IN SERVICIOS.NOMBRE_SERVICIO%TYPE) AS
+    BEGIN
+        FOR r IN (SELECT * FROM SERVICIOS WHERE NOMBRE_SERVICIO = p_nombre_servicio) LOOP
+            DBMS_OUTPUT.PUT_LINE('ID Servicio: ' || r.ID_SERVICIO || ', Precio: ' || r.PRECIO_SERVICIO);
+        END LOOP;
+    END;
+
+    PROCEDURE select_empleados_por_cargo(p_cargo_empleado IN EMPLEADOS.CARGO_EMPLEADO%TYPE) AS
+    BEGIN
+        FOR r IN (SELECT * FROM EMPLEADOS WHERE CARGO_EMPLEADO = p_cargo_empleado) LOOP
+            DBMS_OUTPUT.PUT_LINE('ID Empleado: ' || r.ID_EMPLEADO || ', Nombre: ' || r.NOMBRE_EMPLEADO);
+        END LOOP;
+    END;
+
+    FUNCTION obtener_servicios RETURN SYS_REFCURSOR IS
+        v_cursor SYS_REFCURSOR;
+    BEGIN
+        OPEN v_cursor FOR SELECT * FROM SERVICIOS;
+        RETURN v_cursor;
+    END;
+
+    FUNCTION obtener_servicios_oficina(p_id_oficina IN INTEGER) RETURN SYS_REFCURSOR IS
+        v_cursor SYS_REFCURSOR;
+    BEGIN
+        OPEN v_cursor FOR SELECT * FROM SERVICIOS WHERE COD_OFICINA = p_id_oficina;
+        RETURN v_cursor;
+    END;
+
+    FUNCTION obtener_empleados RETURN SYS_REFCURSOR IS
+        v_cursor SYS_REFCURSOR;
+    BEGIN
+        OPEN v_cursor FOR SELECT * FROM EMPLEADOS;
+        RETURN v_cursor;
+    END;
+
+    FUNCTION obtener_empleados_por_cargo(p_cargo_empleado IN VARCHAR2) RETURN SYS_REFCURSOR IS
+        v_cursor SYS_REFCURSOR;
+    BEGIN
+        OPEN v_cursor FOR SELECT * FROM EMPLEADOS WHERE CARGO_EMPLEADO = p_cargo_empleado;
+        RETURN v_cursor;
+    END;
+END servicios_empleados_pkg;
+/
