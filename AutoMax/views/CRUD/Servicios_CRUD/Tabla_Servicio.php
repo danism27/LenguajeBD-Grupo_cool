@@ -40,7 +40,7 @@
                     <button type="submit" class="btn btn-primary">Leer</button>
                 </form>
                 <button type="button" class="btn btn-success ml-3"
-                    onclick="window.location.href='Crear_Servicio.php'">Crear</button>
+                    onclick="window.location.href='Crear_Servicios.php'">Crear</button>
             </div>
 
             <div class="row">
@@ -80,7 +80,7 @@
                         echo "<td>" . htmlentities($row['NOMBRE_SERVICIO'], ENT_QUOTES) . "</td>\n";
                         echo "<td>" . htmlentities($row['DESCRIPCION_SERVICIO'], ENT_QUOTES) . "</td>\n";
                         echo "<td>" . htmlentities($row['PRECIO_SERVICIO'], ENT_QUOTES) . "</td>\n";
-                        echo "<td><a href='Actualizar_Servicio.php?id=" . $row['ID_SERVICIO'] . "' class='btn btn-warning btn-sm'>Actualizar</a></td>\n";
+                        echo "<td><a href='Actualizar_Servicios.php?id=" . $row['ID_SERVICIO'] . "' class='btn btn-warning btn-sm'>Actualizar</a></td>\n";
                         echo "<td><a href='Procesar_Eliminar_Servicio.php?id=" . $row['ID_SERVICIO'] . "' class='btn btn-danger btn-sm'>Eliminar</a></td>\n";
                         echo "</tr>\n";
                     }
@@ -95,31 +95,31 @@
                 </div>
             </div>
         </div>
-</body>
-
-</html>
-
-<footer>
-    <div class="footer bg-dark mt-5 p-5 text-center navbar-dark" style="color: white; background-color: #000000">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-4">
-                    <h3 class="display-5">Autos Max</h3>
-                    <p class="mt-3">Autos Fidelitas es una empresa dedicada a la venta de autos nuevos y usados,
-                        alquiler de autos y venta de repuestos.</p>
-                </div>
-                <div class="col-md-4">
-                    <h3 class="display-5">Redes Sociales</h3>
-                    <p><i class="fa fa-facebook" aria-hidden="true"></i> Autos Max</p>
-                    <p><i class="fa fa-instagram" aria-hidden="true"></i> Autos Max</p>
-                    <p><i class="fa fa-twitter" aria-hidden="true"></i> Autos Max</p>
-                </div>
-                <div class="col-md-4">
-                    <h3 class="display-5">Contáctanos</h3>
-                    <p><i class="fa fa-phone" aria-hidden="true"></i> Teléfono: 809-555-5555</p>
-                    <p><i class="fa fa-exclamation-circle" aria-hidden="true"></i> Correo: AutosMax@Ufide.ac.cr</p>
+    </header>
+    <footer>
+        <div class="footer bg-dark mt-5 p-5 text-center navbar-dark" style="color: white; background-color: #000000">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-4">
+                        <h3 class="display-5">Autos Max</h3>
+                        <p class="mt-3">Autos Fidelitas es una empresa dedicada a la venta de autos nuevos y usados,
+                            alquiler de autos y venta de repuestos.</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h3 class="display-5">Redes Sociales</h3>
+                        <p><i class="fa fa-facebook" aria-hidden="true"></i> Autos Max</p>
+                        <p><i class="fa fa-instagram" aria-hidden="true"></i> Autos Max</p>
+                        <p><i class="fa fa-twitter" aria-hidden="true"></i> Autos Max</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h3 class="display-5">Contáctanos</h3>
+                        <p><i class="fa fa-phone" aria-hidden="true"></i> Teléfono: 809-555-5555</p>
+                        <p><i class="fa fa-exclamation-circle" aria-hidden="true"></i> Correo: AutosMax@Ufide.ac.cr</p>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</footer>
+    </footer>
+</body>
+
+</html>
