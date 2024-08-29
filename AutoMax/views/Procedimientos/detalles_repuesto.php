@@ -1,7 +1,13 @@
 <?php
+
+$nombre_repuesto = '';
+$fecha_registro = '';
+$nombre_usuario = '';
+$precio_repuesto = 0.00;
+
 // Verificar si se ha proporcionado un código de repuesto en la URL
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $cod_repuesto = $_POST['id_repuesto'];
+    $id_repuesto = $_POST['id_repuesto'];
 
     // Conectar a la base de datos
     $conn = oci_connect('AutoMax', '123', 'localhost/ORCL');
