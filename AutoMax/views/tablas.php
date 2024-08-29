@@ -67,16 +67,16 @@
     <div class="container">
         <h1 class="text-center">Menú de Procedimientos</h1>
         <div class="list-group">
-            <a href="Procedimientos/contar_empelados.php" class="list-group-item list-group-item-action">Contar Empleados</a>
+            <a href="Procedimientos/contar_empleados.php" class="list-group-item list-group-item-action">Contar Empleados</a>
             <a href="Procedimientos/contar_repuestos.php" class="list-group-item list-group-item-action">Contar Repuestos</a>
             <a href="Procedimientos/detalles_repuesto.php" class="list-group-item list-group-item-action">Detalles Repuestos</a>
-            <a href="Procedimientos/nombre_por_cargo_empleado.php" class="list-group-item list-group-item-action">Mostrar nombre de cargo por empleado</a>
+            <a href="Procedimientos/mostrar_nombre_cargo_empleado.php" class="list-group-item list-group-item-action">Mostrar nombre de cargo por empleado</a>
             <a href="Procedimientos/mostrar_oficinas.php" class="list-group-item list-group-item-action">Mostrar Oficinas</a>
             <a href="Procedimientos/mostrar_servicios_precio_mayor.php" class="list-group-item list-group-item-action">Mostrar servicios por Precio Mayor</a>
             <a href="Procedimientos/promedio_precios_repuestos.php" class="list-group-item list-group-item-action">Promedio de precios por repuestos</a>
             <a href="Procedimientos/total_facturas_cliente.php" class="list-group-item list-group-item-action">Total facturas por Cliente</a>
             <a href="Procedimientos/total_servicios_facturados.php" class="list-group-item list-group-item-action">Total de Servicios Facturas</a>
-            <a href="Procedimientos/total_ventas_clientes_nombre.php" class="list-group-item list-group-item-action">Total de Ventas por Nombre de Cliente</a>
+            <a href="Procedimientos/total_venta_clientes_nombre.php" class="list-group-item list-group-item-action">Total de Ventas por Nombre de Cliente</a>
         </div>
     </div>
 
