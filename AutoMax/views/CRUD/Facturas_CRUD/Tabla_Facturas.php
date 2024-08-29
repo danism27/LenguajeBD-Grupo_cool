@@ -34,7 +34,7 @@
             <!-- Botones para Crear y Leer -->
             <div class="mb-3 d-flex justify-content-center align-items-center">
                 <!-- Mini Formulario para Leer Factura Específica -->
-                <form action="leer_factura.php" method="GET" class="form-inline d-flex mr-3">
+                <form action="Leer_Factura.php" method="GET" class="form-inline d-flex mr-3">
                     <label for="id_factura" class="mr-2">Buscar Factura por ID:</label>
                     <input type="number" id="id_factura" name="id_factura" class="form-control mr-2" required>
                     <button type="submit" class="btn btn-primary">Leer</button>
@@ -80,7 +80,7 @@
                         echo "<td>" . htmlentities($row['COD_CLIENTE'], ENT_QUOTES) . "</td>\n";
                         echo "<td>" . htmlentities($row['FECHA_FACTURA'], ENT_QUOTES) . "</td>\n";
                         echo "<td>" . htmlentities($row['TOTAL_FACTURA'], ENT_QUOTES) . "</td>\n";
-                        echo "<td><a href='Actualizar_Factura.php?id=" . $row['ID_FACTURA'] . "' class='btn btn-warning btn-sm'>Actualizar</a></td>\n";
+                        echo "<td><a href='Actualizar_Facturas.php?id=" . $row['ID_FACTURA'] . "' class='btn btn-warning btn-sm'>Actualizar</a></td>\n";
                         echo "<td><a href='Procesar_Eliminar_Factura.php?id=" . $row['ID_FACTURA'] . "' class='btn btn-danger btn-sm'>Eliminar</a></td>\n";
                         echo "</tr>\n";
                     }
