@@ -11,9 +11,9 @@
                 </div>
                 <div class="col-md-4">
                     <h3 class="display-5">Redes Sociales</h3>
-                    <p> <i class="fa fa-facebook" aria-hidden="true"></i> Autos Max</p>
-                    <p> <i class="fa fa-instagram" aria-hidden="true"></i> Autos Max</p>
-                    <p> <i class="fa fa-twitter" aria-hidden="true"></i> Autos Max</p>
+                    <p> <i class="fa fa-facebook" aria-hidden="true"></i> Autos Max Facebook</p>
+                    <p> <i class="fa fa-instagram" aria-hidden="true"></i> Autos Max Instagram</p>
+                    <p> <i class="fa fa-twitter" aria-hidden="true"></i> Autos Max X</p>
                 </div>
                 <div class="col-md-4">
                     <h3 class="display-5">Contactanos</h3>
