@@ -106,6 +106,27 @@
         </div>
     </div>
 
+    <div class="container">
+        <h1 class="text-center">Menú de Cursores</h1>
+        <div class="list-group">
+        <a href="Cursores/contactos.php" class="list-group-item list-group-item-action">Obtener todos los contatcos</a>
+        <a href="Cursores/facturas.php" class="list-group-item list-group-item-action">Obtener todas las facturas</a>
+        <a href="Cursores/repuestos.php" class="list-group-item list-group-item-action">Obtener todos los respuestos</a>
+        <a href="Cursores/detalles_factura.php" class="list-group-item list-group-item-action">Obtener todos los detalles de las facturas</a>
+        <a href="Cursores/oficinas.php" class="list-group-item list-group-item-action">Obtener todos las oficinas</a>
+        <a href="Cursores/vehiculo.php" class="list-group-item list-group-item-action">Obtener todos los vehiculos</a>
+        <a href="Cursores/servicios.php" class="list-group-item list-group-item-action">Obtener todos los servicios</a>
+        <a href="Cursores/empleados.php" class="list-group-item list-group-item-action">Obtener todos los empleados</a>
+        <a href="Cursores/facturas_detalles.php" class="list-group-item list-group-item-action">Obtener todos los detalles de compra</a>
+        <a href="Cursores/contactos_facturas.php" class="list-group-item list-group-item-action">Obtener todas las facturas de los contatcos</a>
+        <a href="Cursores/total_repuestos.php" class="list-group-item list-group-item-action">Obtener el Total de los Repuestos</a>
+        <a href="Cursores/servicio_vehiculos.php" class="list-group-item list-group-item-action">Obtener todos los Servicios de los Vehiculos</a>
+        <a href="Cursores/facturas_cliente.php" class="list-group-item list-group-item-action">Obtener todas las facturas del Cliente</a>
+        <a href="Cursores/detalles_repuestos.php" class="list-group-item list-group-item-action">Obtener todos los detalles de los Repuestos</a>
+        <a href="Cursores/facturas_repuestos.php" class="list-group-item list-group-item-action">Obtener todas las facturas de los Repuestos</a>
+        </div>
+    </div>
+
 </body>
 
 <footer>

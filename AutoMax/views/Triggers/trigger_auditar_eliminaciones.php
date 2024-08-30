@@ -29,24 +29,35 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if ($factura === false) {
             echo "<div class='error'>Factura no encontrada.</div>";
         } else {
-            // Definir la sentencia SQL para eliminar la factura
-            $sql_delete_factura = "
-            DELETE FROM FACTURAS 
-            WHERE ID_FACTURA = :id_factura";
+            // Eliminar primero los detalles de la factura
+            $sql_delete_detalle = "
+            DELETE FROM DETALLE_FACTURA 
+            WHERE COD_FACTURA = :id_factura";
             
-            // Preparar la consulta
-            $stmt_delete_factura = $conexion->prepare($sql_delete_factura);
-            $stmt_delete_factura->bindParam(':id_factura', $id_factura);
-
+            $stmt_delete_detalle = $conexion->prepare($sql_delete_detalle);
+            $stmt_delete_detalle->bindParam(':id_factura', $id_factura);
+            
             try {
-                // Ejecutar la eliminación
-                $stmt_delete_factura->execute();
-                echo "<div class='success'>Factura eliminada exitosamente.</div>";
-                echo "<div class='info'>Detalles de la factura eliminada: ID=" . htmlspecialchars($factura['ID_FACTURA']) . 
-                    ", Código=" . htmlspecialchars($factura['COD_FACTURA']) . ".</div>";
+                $stmt_delete_detalle->execute();
+                
+                // Ahora eliminar la factura
+                $sql_delete_factura = "
+                DELETE FROM FACTURAS 
+                WHERE ID_FACTURA = :id_factura";
+                
+                $stmt_delete_factura = $conexion->prepare($sql_delete_factura);
+                $stmt_delete_factura->bindParam(':id_factura', $id_factura);
+
+                try {
+                    $stmt_delete_factura->execute();
+                    echo "<div class='success'>Factura eliminada exitosamente.</div>";
+                    echo "<div class='info'>Detalles de la factura eliminada: ID=" . htmlspecialchars($factura['ID_FACTURA']) . 
+                        ", Código=" . htmlspecialchars($factura['COD_FACTURA']) . ".</div>";
+                } catch (PDOException $e) {
+                    echo "<div class='error'>Error al eliminar la factura: " . $e->getMessage() . "</div>";
+                }
             } catch (PDOException $e) {
-                // Capturar y mostrar el error
-                echo "<div class='error'>Error al eliminar la factura: " . $e->getMessage() . "</div>";
+                echo "<div class='error'>Error al eliminar los detalles de la factura: " . $e->getMessage() . "</div>";
             }
         }
     } catch (PDOException $e) {
