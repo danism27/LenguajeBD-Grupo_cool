@@ -77,7 +77,7 @@
                         echo "<td>" . htmlentities($row['ID_OFICINA'], ENT_QUOTES) . "</td>\n";
                         echo "<td>" . htmlentities($row['NOMBRE_OFICINA'], ENT_QUOTES) . "</td>\n";
                         echo "<td>" . htmlentities($row['FECHA_REGISTRO'], ENT_QUOTES) . "</td>\n";
-                        echo "<td><a href='Actualizar_Ofcinas.php?id=" . $row['ID_OFICINA'] . "' class='btn btn-warning btn-sm'>Actualizar</a></td>\n";
+                        echo "<td><a href='Actualizar_Oficinas.php?id=" . $row['ID_OFICINA'] . "' class='btn btn-warning btn-sm'>Actualizar</a></td>\n";
                         echo "<td><a href='Procesar_Eliminar_Oficina.php?id=" . $row['ID_OFICINA'] . "' class='btn btn-danger btn-sm'>Eliminar</a></td>\n";
                         echo "</tr>\n";
                     }

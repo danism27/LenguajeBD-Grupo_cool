@@ -8,53 +8,42 @@ if (!$conn) {
 }
 
 // Inicializar variables
-$id_oficina = null;
-$info_oficina = null;
+$id_empleado = null;
+$empleado = null;
 
 // Verificar si se ha enviado el formulario
-if (isset($_POST['id_oficina'])) {
-    $id_oficina = $_POST['id_oficina'];
+if (isset($_POST['submit'])) {
+    $id_empleado = $_POST['id_empleado'];
 
-    // Preparar y ejecutar el bloque PL/SQL para obtener la información de la oficina
-    $sql = 'BEGIN obtener_informacion_oficina(:id_oficina, :info_oficina); END;';
+    // Consulta SQL para obtener detalles del empleado
+    $sql = 'SELECT NOMBRE_EMPLEADO, APELLIDO_EMPLEADO, CARGO_EMPLEADO, FECHA_CONTRATACION, SALARIO 
+            FROM EMPLEADOS 
+            WHERE ID_EMPLEADO = :id_empleado';
     $stid = oci_parse($conn, $sql);
-
-    // Crear un cursor
-    $cursor = oci_new_cursor($conn);
-    oci_bind_by_name($stid, ':id_oficina', $id_oficina, -1, SQLT_INT);
-    oci_bind_by_name($stid, ':info_oficina', $cursor, -1, OCI_B_CURSOR);
-
-    // Ejecutar el bloque PL/SQL
-    if (oci_execute($stid)) {
-        // Ejecutar el cursor
-        if (oci_execute($cursor)) {
-            $info_oficina = oci_fetch_assoc($cursor);
-        } else {
-            $e = oci_error($cursor);
-            echo "<p>Error al ejecutar el cursor: " . htmlentities($e['message'], ENT_QUOTES) . "</p>";
-            $info_oficina = null;
-        }
-    } else {
-        $e = oci_error($stid);
-        echo "<p>Error al ejecutar el bloque PL/SQL: " . htmlentities($e['message'], ENT_QUOTES) . "</p>";
-        $info_oficina = null;
-    }
-
-    // Liberar recursos
+    
+    // Bind variable
+    oci_bind_by_name($stid, ':id_empleado', $id_empleado);
+    
+    // Ejecutar la consulta
+    oci_execute($stid);
+    
+    // Obtener los detalles del empleado
+    $empleado = oci_fetch_assoc($stid);
+    
+    // Liberar el statement
     oci_free_statement($stid);
-    oci_free_statement($cursor);
 }
 
-// Consultar todas las oficinas para el select
-$sql_oficinas = 'SELECT ID_OFICINA, NOMBRE_OFICINA FROM OFICINAS ORDER BY NOMBRE_OFICINA';
-$stid_oficinas = oci_parse($conn, $sql_oficinas);
-oci_execute($stid_oficinas);
+// Obtener la lista de empleados para el formulario
+$sql = 'SELECT ID_EMPLEADO, NOMBRE_EMPLEADO FROM EMPLEADOS ORDER BY NOMBRE_EMPLEADO';
+$stid = oci_parse($conn, $sql);
+oci_execute($stid);
 ?>
 
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <title>Detalles de la Oficina</title>
+    <title>Detalles del Empleado</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="main.css">
@@ -84,34 +73,42 @@ oci_execute($stid_oficinas);
     <br><br><br><br><br>
 
     <div class="container">
-        <h1 class="text-center">Detalles de la Oficina</h1>
+        <h1 class="text-center">Detalles del Empleado</h1>
 
-        <!-- Formulario para seleccionar la oficina -->
+        <!-- Formulario para seleccionar un empleado -->
         <form method="post" action="">
             <div class="mb-3">
-                <label for="id_oficina" class="form-label">Seleccione una Oficina:</label>
-                <select id="id_oficina" name="id_oficina" class="form-select" required>
-                    <option value="">Seleccione una oficina</option>
-                    <?php while ($row = oci_fetch_assoc($stid_oficinas)) : ?>
-                        <option value="<?php echo htmlentities($row['ID_OFICINA'], ENT_QUOTES); ?>"
-                            <?php echo ($row['ID_OFICINA'] == $id_oficina) ? 'selected' : ''; ?>>
-                            <?php echo htmlentities($row['NOMBRE_OFICINA'], ENT_QUOTES); ?>
+                <label for="id_empleado" class="form-label">Selecciona un Empleado:</label>
+                <select id="id_empleado" name="id_empleado" class="form-select" required>
+                    <option value="">Seleccione un empleado</option>
+                    <?php while ($row = oci_fetch_assoc($stid)) : ?>
+                        <option value="<?php echo htmlentities($row['ID_EMPLEADO'], ENT_QUOTES); ?>"
+                            <?php echo ($row['ID_EMPLEADO'] == $id_empleado) ? 'selected' : ''; ?>>
+                            <?php echo htmlentities($row['NOMBRE_EMPLEADO'], ENT_QUOTES); ?>
                         </option>
                     <?php endwhile; ?>
                 </select>
             </div>
-            <button type="submit" name="submit" class="btn btn-primary">Ver detalles</button>
+            <button type="submit" name="submit" class="btn btn-primary">Obtener Detalles</button>
         </form>
 
-        <!-- Mostrar los detalles de la oficina si se ha seleccionado una -->
-        <?php if ($info_oficina) : ?>
+        <!-- Mostrar los detalles del empleado si se ha seleccionado uno -->
+        <?php if ($empleado) : ?>
             <br>
             <div class="alert alert-info">
-                <h4>Detalles de la Oficina:</h4>
-                <p><strong>Información:</strong> <?php echo htmlentities($info_oficina['INFO_OFICINA'], ENT_QUOTES); ?></p>
+                <h4>Nombre del Empleado:</h4>
+                <p><?php echo htmlentities($empleado['NOMBRE_EMPLEADO'], ENT_QUOTES); ?></p>
+                <h4>Apellido del Empleado:</h4>
+                <p><?php echo htmlentities($empleado['APELLIDO_EMPLEADO'], ENT_QUOTES); ?></p>
+                <h4>Cargo del Empleado:</h4>
+                <p><?php echo htmlentities($empleado['CARGO_EMPLEADO'], ENT_QUOTES); ?></p>
+                <h4>Fecha de Contratación:</h4>
+                <p><?php echo htmlentities(date('d/m/Y', strtotime($empleado['FECHA_CONTRATACION'])), ENT_QUOTES); ?></p>
+                <h4>Salario:</h4>
+                <p><?php echo htmlentities(number_format($empleado['SALARIO'], 2), ENT_QUOTES); ?></p>
             </div>
-        <?php elseif ($id_oficina !== null) : ?>
-            <p class="text-center">No se encontró información para la oficina seleccionada.</p>
+        <?php elseif ($id_empleado !== null) : ?>
+            <p class="text-center">No se encontraron detalles para el empleado seleccionado.</p>
         <?php endif; ?>
         
         <br>
@@ -134,14 +131,13 @@ oci_execute($stid_oficinas);
                 <div class="col-md-4">
                     <h3 class="display-5">Redes Sociales</h3>
                     <p><i class="fa fa-facebook" aria-hidden="true"></i> Autos Max</p>
-                    <p><i class="fa fa-instagram" aria-hidden="true"></i> @autos_max</p>
-                    <p><i class="fa fa-twitter" aria-hidden="true"></i> @autos_max</p>
+                    <p><i class="fa fa-instagram" aria-hidden="true"></i> Autos Max</p>
+                    <p><i class="fa fa-twitter" aria-hidden="true"></i> Autos Max</p>
                 </div>
                 <div class="col-md-4">
                     <h3 class="display-5">Contáctanos</h3>
-                    <p><i class="fa fa-phone" aria-hidden="true"></i> +1 (800) 555-5555</p>
-                    <p><i class="fa fa-envelope" aria-hidden="true"></i> info@autosmax.com</p>
-                    <p><i class="fa fa-map-marker" aria-hidden="true"></i> 123 Calle Principal, Ciudad, País</p>
+                    <p><i class="fa fa-phone" aria-hidden="true"></i> Teléfono: 809-555-5555</p>
+                    <p><i class="fa fa-exclamation-circle" aria-hidden="true"></i> Correo: AutosMax@Ufide.ac.cr</p>
                 </div>
             </div>
         </div>
@@ -151,6 +147,6 @@ oci_execute($stid_oficinas);
 
 <?php
 // Liberar recursos y cerrar la conexión a la base de datos
-oci_free_statement($stid_oficinas);
+oci_free_statement($stid);
 oci_close($conn);
 ?>

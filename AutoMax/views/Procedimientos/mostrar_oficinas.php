@@ -1,7 +1,17 @@
 <?php
+
+$id_vehiculo = $_POST['id_vehiculo'];
+$num_placa = null;
+$tipo_vehiculo = null;
+$estado_vehiculo = null;
+$marca = null;
+$modelo = null;
+$fecha_registro = null;
+$nombre_usuario = null;
+
+
 // Verificar si se ha proporcionado un ID en la URL
-if (isset($_GET['id_vehiculo'])) {
-    $id_vehiculo = $_GET['id_vehiculo'];
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     // Conectar a la base de datos
     $conn = oci_connect('AutoMax', '123', 'localhost/ORCL');
@@ -11,12 +21,12 @@ if (isset($_GET['id_vehiculo'])) {
         exit;
     }
 
-    // Obtener los datos actuales del vehículo
+    // Inicializar variables para recibir los datos del procedimiento
+    $num_placa = $tipo_vehiculo = $estado_vehiculo = $marca = $modelo = $fecha_registro = $nombre_usuario = null;
+
+    // Preparar la consulta
     $sql = 'BEGIN get_vehiculo(:id_vehiculo, :num_placa, :tipo_vehiculo, :estado_vehiculo, :marca, :modelo, :fecha_registro, :nombre_usuario); END;';
     $stid = oci_parse($conn, $sql);
-    
-    // Variables para recibir los datos del procedimiento
-    $num_placa = $tipo_vehiculo = $estado_vehiculo = $marca = $modelo = $fecha_registro = $nombre_usuario = null;
 
     // Bind variables
     oci_bind_by_name($stid, ':id_vehiculo', $id_vehiculo);
@@ -27,7 +37,7 @@ if (isset($_GET['id_vehiculo'])) {
     oci_bind_by_name($stid, ':modelo', $modelo, 100);
     oci_bind_by_name($stid, ':fecha_registro', $fecha_registro, 50);
     oci_bind_by_name($stid, ':nombre_usuario', $nombre_usuario, 100);
-    
+
     // Ejecutar el procedimiento
     if (!oci_execute($stid)) {
         $e = oci_error($stid);
@@ -36,28 +46,19 @@ if (isset($_GET['id_vehiculo'])) {
         oci_close($conn);
         exit;
     }
-    
+
+    // Liberar el statement y cerrar la conexión
     oci_free_statement($stid);
-
-    // Llamar al procedimiento mostrar_oficinas (parece que no se utiliza, así que lo eliminaremos)
-    // $sql_oficinas = 'BEGIN mostrar_oficinas; END;';
-    // $stid_oficinas = oci_parse($conn, $sql_oficinas);
-    // oci_execute($stid_oficinas);
-    // oci_free_statement($stid_oficinas);
-
-    // Liberar recursos y cerrar la conexión
     oci_close($conn);
-} else {
-    echo "<p>No se proporcionó un ID de vehículo en la URL.</p>";
-    exit();
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="es">
 
 <head>
-    <title>Actualizar Vehículo - Paso 1</title>
+    <title>Mostrar Vehículo - Paso 1</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="main.css">
@@ -85,10 +86,17 @@ if (isset($_GET['id_vehiculo'])) {
             </div>
         </nav>
     </header>
-    <br><br><br><br><br>
+<!-- Botones para Mostrar -->
+<div class="mb-3 d-flex justify-content-center align-items-center">
+    <!-- Mini Formulario para Mostrar -->
+    <form method="POST" class="form-inline d-flex mr-3">
+        <label for="id_empleado" class="mr-2">Mostrar Oficinas:</label>
+        <button type="submit" class="btn btn-primary">Mostrar</button>
+    </form>
+</div>
 
     <div class="container">
-        <h1 class="text-center">Actualizar Vehículo</h1>
+        <h1 class="text-center">Mostrar Oficinas</h1>
         <!-- Formulario para ver y enviar los datos del vehículo -->
         <form action="Procesar_Actualizar_Vehiculo.php" method="GET">
             <!-- Campo oculto para el ID del vehículo -->
